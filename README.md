@@ -7,6 +7,6 @@
 # APP
 APP_ENVIRONMENT=dev
 APP_PORT=3000
-APP_HOST=0.0.0.0
+APP_HOST=localhost
 
 ```
