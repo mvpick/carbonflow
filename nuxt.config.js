@@ -19,7 +19,10 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    ],
+    script:[
+      { src: `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${process.env.KAKAO_KEY}&libraries=services` }
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
