@@ -3,10 +3,9 @@
         <div id="map" style="width: 500px; height: 400px"></div>
     </div>
   </template>
-  
+
   <script>
   export default {
-    name: 'TestPage',
     data() {
         return {
             map: null,
@@ -55,10 +54,7 @@
 
                 }
             )
-
-
         },
     },
   }
   </script>
-  
