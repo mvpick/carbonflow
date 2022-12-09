@@ -3,11 +3,10 @@
         <div id="map" style="width: 1000px; height: 800px"></div>
     </div>
   </template>
-  
+
   <script>
   import sigungu from '~/assets/data/sigungu.json'
   export default {
-    name: 'TestPage',
     data() {
         return {
             map: null,
@@ -85,9 +84,7 @@
             //     }
             // )
 
-
         },
     },
   }
   </script>
-  
