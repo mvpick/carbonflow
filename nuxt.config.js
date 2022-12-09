@@ -27,12 +27,21 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    // '~assets/scss/app.scss',
+    '~assets/scss/common.scss',
+    '~assets/fonts/Pretendard.css',
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
   ],
-
+  styleResources: {
+    less: '~/assets/scss/*.scss',
+    scss: [
+      '@/assets/scss/mixin.scss',
+      '@/assets/scss/variable.scss'
+    ]
+  },
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
@@ -40,6 +49,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/style-resources',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules

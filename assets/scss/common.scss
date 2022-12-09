@@ -1,0 +1,1260 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font-family: 'Pretendard';
+	font-weight: 400;
+	vertical-align: baseline;
+	color: #1A1714;
+}
+// html 스크롤바 커스텀
+html{
+	::-webkit-scrollbar{
+		width: 5px;
+		padding-right: 24px;
+		height: 80%; 
+		}
+
+	::-webkit-scrollbar-track {
+		background: #EFF1F5;
+	border-radius: 5px;
+	padding-right: 24px;
+	height: 50%;
+	}
+
+	::-webkit-scrollbar-thumb{
+    background: $main_color;
+    border-radius: 5px;
+    margin-right: 4px;
+    height: 10%;
+    padding-right: 24px;
+    }
+		
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, b {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+.v-application ul, .v-application ol{
+	padding-left: 0 !important;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+
+p{
+	margin-bottom: 0px;
+}
+button{
+	display: block;
+}
+	
+}
+
+input:focus,select {
+	outline:none;
+}
+
+.w100 {
+	width: 100%;
+}
+.tab_section{
+	// border-bottom: 1px solid $color_main;
+	>div.flex_box{
+		@include desktop{
+			justify-content: space-between;
+			align-items: center;
+		}
+		button{
+			// margin-right: 12px;
+			color: #616161;
+			font-weight: bold;
+			padding: 8px 12px;
+			border-bottom: 2px solid #e4e4e4;
+			width: 100%;
+			
+			&:nth-child(2){
+				// margin-left: 12px;
+			}
+			&.on_tab{
+				color: $color_main;
+				border-bottom: 2px solid $color_main;
+				// background-color: $color_main;
+				font-weight: bold;
+			}
+		}
+	}
+}
+
+
+///////////////////// COMMON CONTAIN ///////////////////////
+
+.com_contain {
+	width: 100%;
+	max-width: 800px;
+	padding: 56px 16px 0px 16px;
+	margin: 0 auto;
+
+	@include fold {
+		// padding: 0px 24px;
+	}
+
+	@include desktop {
+		padding: 64px 16px 0px 16px;
+	}
+
+	@include desktop_large {
+		// padding: 220px 0 145px 0;
+	}
+}
+.ad_contain {
+	width: 100%;
+	max-width: 1600px;
+	padding: 0px 16px 0px 16px;
+	
+	margin-left: 250px;
+}
+
+.com_contents {
+	width: 100%;
+
+	@include desktop_large {
+		width: 1080px;
+		margin: 0 auto;
+	}
+}
+.flex_box{
+	display: flex;
+}
+.column{
+	flex-direction: column;
+}
+// 말줄임
+.ellipsis{
+	display: -webkit-box !important;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-decoration: none;
+}
+.dashtit{
+	font-size: 16px;
+	text-align: center;
+	font-weight: 600;
+	@include desktop{
+		font-size: 28px;
+		text-align: left;
+	}
+}
+
+
+///////////////////// FONT SIZE ///////////////////////
+
+.main_title {
+	font-size: 20px;
+	margin: 32px 0 16px;
+	font-weight: bold;
+	@include fold {
+		font-size: 20px;
+	}
+
+	@include tablet {
+		font-size: 24px;
+	}
+
+	@include desktop-large {
+		font-size: 24px;
+		margin: 48px 0 24px;
+	}
+}
+
+.com_subTitle {
+	font-size: 16px;
+
+	@include fold {
+		font-size: 18px;
+	}
+
+	@include desktop {
+		font-size: 20px;
+	}
+
+	@include desktop_large {
+		font-size: 35px;
+	}
+}
+
+.ft_10 {
+	font-size: 10px;
+
+	@include tablet{
+		font-size: 12px;
+	}
+}
+
+.ft_12 {
+	font-size: 12px;
+}
+
+.ft_14 {
+	font-size: 12px;
+
+	@include tablet {
+		font-size: 14px;
+	}
+}
+
+.ft_16 {
+	font-size: 14px;
+
+	@include desktop {
+		font-size: 16px;
+	}
+}
+
+.ft_18 {
+	font-size: 16px;
+
+	@include desktop {
+		font-size: 18px;
+	}
+}
+
+.ft_20 {
+	font-size: 16px;
+
+	@include tablet{
+		font-size: 16px;
+	}
+
+	@include desktop {
+		font-size: 20px;
+	}
+}
+
+.ft_24 {
+	font-size: 18px;
+
+	@include tablet {
+		font-size: 24px;
+	}
+
+	@include desktop {
+		font-size: 24px;
+	}
+}
+
+.ft_30 {
+	font-size: 18px;
+
+	@include tablet {
+		font-size: 24px;
+	}
+
+	@include desktop {
+		font-size: 30px;
+	}
+}
+
+.ft_35 {
+	font-size: 22px;
+
+	@include tablet {
+		font-size: 28px;
+	}
+
+	@include desktop {
+		font-size: 35px;
+	}
+}
+
+.ft_45 {
+	font-size: 20px;
+
+	@include tablet {
+		font-size: 36px;
+	}
+
+	@include desktop {
+		font-size: 45px;
+	}
+}
+// font-wegit///
+.ft_T{
+	font-weight: 100;
+}
+.ft_l{
+	font-weight: 300;
+}
+.ft_Dl{
+	font-weight: 350;
+}
+.ft_R{
+	font-weight: 400;
+}
+.ft_M{
+	font-weight: 500;
+}
+.ft_Bo{
+	font-weight: 700;
+}
+.ft_Bl{
+	font-weight: 900;
+}
+
+///////////////////// INPUT ///////////////////////
+
+///오류 메세지 작업//
+img{
+	vertical-align: bottom;
+}
+//오류 일시
+.input.nonproper{
+	input:focus{border: 1px solid #FF2525;}
+	p{
+		margin-top: 4px;
+		color: #FF2525;
+		margin-bottom: 0;
+		font-size: 14px;
+		display: block;
+		font-weight: 400;
+		
+	}
+}
+
+.input.proper{
+	input:focus{
+		border: 1px solid $color_main;
+	}
+
+	p{
+		font-size: 10px;
+		display: none;
+		margin-bottom: 0;
+	}
+	
+}
+
+.input{
+	margin-bottom: 24px;
+	.inputName {
+		// color: #D9DADE;
+		margin-bottom: 4px;
+		@include desktop{
+		}
+	}
+	input {
+		border: 1px solid #D9DADE;
+		background-color: #fff;
+		color: #00070D;
+		width: 100%;
+		padding: 16px;
+		border-radius: 4px;
+		
+		// @include desktop{
+		// 	font-size: 16px;
+
+		// }
+	}
+	p{
+		color: #D32F2F;
+		font-size: 14px;
+	}
+
+	// 인풋 포커싱
+	input:focus{
+		border: 1px solid $color_main;
+	}
+	
+	// 플레이스 홀더
+	input::placeholder{
+		color: #81868A;
+		font-weight: 400;
+		font-size: 16px;
+		@include tablet{
+			font-size: 16px;
+		}
+	}
+
+	// 비활성화 버튼
+	input:disabled{
+		background-color: #E4E4E4;
+		color: #BCBCBC;
+		width: 100%!important;//been
+	}
+
+	textarea{
+		border: 1px solid #e4e4e4;
+		border-radius: 4px;
+		background-color:#F2F2F2;;
+		width: 100%;
+		padding:16px;
+		overflow-y: auto;
+		resize: none;
+	}
+	textarea:focus{
+		border: 1px solid $color_main;
+		outline:none
+	}
+	textarea::placeholder{
+		color: #81868A;
+		font-weight: 300;
+	}
+	button.date{
+		// background: url("~/assets/img/date.png") no-repeat center right 16px;
+		width: 100%;
+	}
+
+	.search{
+		background: url('~/assets/img/icon/search_icon.png') no-repeat center right 12px /24px 24px;
+		// padding-left: 50px;
+		padding-right: 50px;
+			@include desktop{
+			background: url('~/assets/img/icon/search_icon.png') no-repeat center right 16px /24px 24px;
+
+			}
+	}
+
+	.search_grey{
+		background: url('~/assets/img/icon/search_grey.png') no-repeat center right 12px /24px 24px;
+		background-color: #ededed;
+		@include desktop{
+		background: url('~/assets/img/icon/search_grey.png') no-repeat center right 16px /16px 16px;
+		background-color: #ededed;
+		}
+	}
+
+	//셀렉트 박스
+	select{
+		width: 100%;
+		// border: 1px solid #051230;
+		border-radius: 4px;
+		// height: 33px;
+		padding: 16px;
+		background: url('~/assets/img/icon/arrow_drop_down.png') no-repeat center right 12px /24px 24px;
+		border: 1px solid #D9DADE;
+		// color: #81868A;
+		@include desktop{
+			font-size: 16px;
+		}
+		&:focus{
+			border: 1px solid $color_main;
+		}
+	}
+	select:disabled{
+		background-color: #E4E4E4;
+		color: #292a2d;
+	}
+	&.selectBox{
+		position: relative;
+
+		input{
+			width: 100%;
+			background: url('~/assets/img/icon/arrow_drop_down.png') no-repeat center right 12px /24px 24px;
+			background-color: #F2F2F2;
+			@include desktop{
+			background-position: center right 16px;
+			// background-size: 32px 32px;
+			}
+		}
+	
+		ul.select_option{
+			position: absolute;
+			top: 33px;
+			left: 0;
+			z-index: 10;
+			width: 100%;
+			padding-left: 0px;
+			height: 200px;
+			border-radius: 20px;
+			background-color: #fff;
+			box-shadow: 8px 8px 16px rgb(0 0 0 / 5%);
+			overflow-y: scroll;
+			
+				@include desktop{
+				top: 47px;
+				height: 320px;
+				}
+			li{
+				// margin-bottom: 12px;
+				padding: 12px 24px;
+				padding-left: 24px;
+				
+				cursor: pointer;
+				width: 100%;
+				word-break: break-all;
+				@include desktop{
+					font-size: 16px;
+				}
+
+				&:hover{
+					background-color: rgb(0 0 0 / 10%);
+				}
+				&:last-child{
+					margin-bottom: 0;
+					&:hover{
+						background-color: #fff;
+					}
+				}
+			}
+			.cancel_btn{
+				position: sticky;
+				bottom: 0;
+				left: 0;
+				padding: 4px 8px 4px 0;
+				text-align: right;
+				width: 100%;
+				background-color: #fff;
+			img{
+				width: 24px;
+				height: 24px;
+				@include desktop{
+				width: 32px;
+				height: 32px;
+			}
+			}
+		}
+	}
+
+	.checkbox_contain{
+		display: flex;
+		align-items: center;
+	}
+}
+
+&.radioBox{
+	display: flex;
+	align-items: center;
+	label{
+		color:#00070D;
+		@include desktop{
+			font-size: 16px;
+			margin-left: 8px;
+		}
+	}
+}
+	// 라디오 
+input[type=radio]{
+		// border: 2px solid #CECECE;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background: url("~/assets/img/icon/radio_button_unchecked.png") no-repeat center center;
+		width: 24px;
+		height: 24px;
+		border-radius: 100%;
+		padding-left: 0;
+		border: none !important;
+		outline: none;
+		&:focus{
+			border: none;
+		}
+	}
+	input[type=radio]:checked{
+			// background:url("~/assets/img/check_box_on.png") center /14px 14px;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			width: 24px;
+			height: 24px;
+			background: url("~/assets/img/icon/radio_button_checked.png") no-repeat center center;
+			border-radius: 100%;
+			padding-left: 0;
+			border: none;
+			border-radius: 0;		
+	}
+
+	input[type=radio]:disabled {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 24px !important; 
+		height: 24px;
+		background: url("~/assets/img/icon/radio_button_disabled.png") no-repeat center center / 24px 24px;
+		border-radius: 100%;
+		padding-left: 0;
+		border: none;
+		border-radius: 0;
+	}
+
+   //체크 박스
+	input[type=checkbox]{
+
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background: url("~/assets/img/icon/check_box_outline_blank.png") no-repeat center center;
+		width: 32px;
+		height: 32px;
+		// border-radius: 100%;
+		border-radius: 0;
+		padding-left: 0;
+		// padding-top: 4px;
+		position: relative;
+		top:6px;
+		border: none;
+		&:focus{
+			border: none;
+		}
+		@include desktop{
+			width: 32px;
+			height: 32px;
+			background: url("~/assets/img/icon/check_box_outline_blank.png") no-repeat center center;
+		}
+
+	
+}
+input[type=checkbox]:checked{
+		
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 32px;
+		height: 32px;
+		background: url("~/assets/img/icon/check_box.png") no-repeat center center;
+		padding-left: 0;
+		
+		@include desktop{
+			width: 32px;
+			height: 32px;
+			background: url("~/assets/img/icon/check_box.png") no-repeat center center;
+		}	
+}
+
+
+.input2Box{
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	input{
+		width: 100%;
+		padding-right: 117px;
+		// width: calc(100% - 109px);
+		// @include desktop{
+		// width: calc(100% - 163px);
+
+		// }
+	}
+
+	.inputBtn{
+		width: 101px;
+		height: 33px;
+		padding: 0;
+		font-weight: 300;
+		position: absolute;
+		right: 10px;
+		top: 18%;
+
+		// @include desktop{
+		// 	font-size: 14px;
+		// 	height: 48px;
+		// 	width: 151px;
+		// }
+	}
+}
+
+	}
+	.center{
+		text-align: center;
+	}
+
+.necessary{
+	color: #FF2525;
+}
+
+.errorInput{
+	color: #DD1D1D;
+	font-size: 10px;
+	font-weight: 300;
+	margin-bottom: 0;
+	margin-top: 4px;
+}
+
+//아이콘/////////////////
+.heart{
+	width: 24px;
+	height: 24px;
+	background: url("~/assets/img/icon/heart.png") no-repeat center;
+	display: block;
+}
+.emheart{
+	width: 24px;
+	height: 24px;
+	background: url("~/assets/img/icon/em_heart.png") no-repeat center;
+	display: block;
+}
+button.x_btn{
+	display: block;
+	width: 24px;
+	height: 24px;
+	background:url("~/assets/img/icon/x_button.png") no-repeat center;
+}
+.more{
+	display: block;
+	width: 24px;
+	height: 24px;
+	background:url("~/assets/img/icon/more.png") no-repeat center;
+}
+
+////////////////////BOTTON/////////////////////////
+
+// 파랑 버튼
+.mainBtn1{
+ padding: 10px 4px;
+ width: 100%;
+ background-color: $color_main;
+ color: #fff;
+ border-radius: 25px;
+ text-align: center;
+ font-size: 14px;
+ @include desktop{
+	 font-size: 16px;
+ }
+}
+
+//테두리 파랑버튼
+.mainBtn2{
+	padding: 10px 8px;
+	width: 100%;
+	background-color: #fff;
+	color: #363636;
+	border: 1px solid $color_main;
+	border-radius: 25px;
+	font-size: 14px;
+
+	text-align: center;
+	@include desktop{
+		font-size: 16px;
+	}
+ }
+
+ .mainBtn3{
+	padding: 14px 0;
+	width: 100%;
+	background-color: #FFCF23;
+	color: #fff;
+	// border: 1px solid #FFCF23;
+	border-radius:5px;
+	font-weight: 500;
+	@include desktop{
+		font-size: 16px;
+	}
+ }
+
+
+.subBtn1{
+	color: #022064;
+	width: 100%;
+	padding: 14px 0;
+	background-color: #fff;
+	border: 1px solid #022064;
+	border-radius: 5px;
+}
+
+ .disableBtn{
+	padding: 12px 0;
+	width: 100%;
+	background-color: #E4E4E4;
+	color: #BCBCBC;
+	border-radius: 5px;
+	font-size: 14px;
+	font-weight: 500;
+	text-align: center;
+ }
+ .fileBox{
+	 flex-wrap: wrap;
+	 
+
+ >.filedown{
+	 margin-right: 8px;
+	 margin-bottom: 8px;
+	 border-radius:100px;
+	 padding: 8px 40px 8px 16px;
+	 background: url("~/assets/img/icon/filedown.png") no-repeat center right 12px /20px 20px;
+	 background-color: #EFF1F5;
+	 font-weight: 500;
+	 @include desktop{
+		 background: url("~/assets/img/icon/filedown.png") no-repeat center right 16px ;
+		 background-color: #EFF1F5;
+		 padding: 12px 60px 12px 24px;
+	 }
+ }
+ .filedown2{
+	margin-right: 8px;
+	margin-bottom: 8px;
+	border-radius:100px;
+	font-size: 14px;
+	padding: 8px 40px 8px 16px;
+	background: url("~/assets/img/icon/filedown.png") no-repeat center right 12px /20px 20px;
+	background-color: #fff;
+	border: 1px solid $color_main;
+	font-weight: 500;
+	@include desktop{
+		font-size: 14px;
+		background: url("~/assets/img/icon/filedown.png") no-repeat center right 16px ;
+		background-color: #EFF1F5;
+		background-color: #fff;
+		border: 1px solid $color_main;
+		padding: 12px 60px 12px 24px;
+	}
+}
+.filedownX{
+	border-radius:100px;
+	padding: 8px 40px 8px 16px;
+	background-color: #EFF1F5;
+	font-weight: 500;
+	position: relative;
+	span.x_btn{
+	background: url("~/assets/img/icon/x_button.png") no-repeat center / 20px 20px;
+	width: 24px;
+	height: 24px;
+	display: block;
+	position: absolute;
+	top: 0;
+	transform: translateY(50%);
+	right: 12px;
+	}
+	@include desktop{
+		// background: url("~/assets/img/x_button.png") no-repeat center right 16px ;
+		background-color: #EFF1F5;
+		padding: 12px 60px 12px 24px;
+	}
+}
+}
+
+
+
+
+
+
+ .btnBox{
+	 display: flex;
+	 justify-content: space-between;
+	 button{
+		 width: calc((100% - 8px) /2);		 
+	}
+ }
+ .detailBtnDown{
+	 display: inline;
+	 color: #fff;
+	//  background: url("~/assets/img/down_polygon.png") no-repeat center right ;
+	 background-color: #1546B4;
+	 padding-right: 16px;
+	 margin-bottom: 0;
+ }
+
+.star{
+	margin-right: 8px;               
+	.fullstar{    
+		width: 32px;
+		height: 32px;
+		display: inline-block;
+		// background: url("~/assets/img/feedback_full_star.png") no-repeat center;
+	}
+	.emstar{
+		width: 32px;
+		height: 32px;
+		display: inline-block;
+		// background: url("~/assets/img/feedback_em_star.png") no-repeat center;
+	}
+}
+
+button.xBtn{
+	display: block;
+	width: 24px;
+	height: 24px;
+	background:url("~/assets/img/icon/x_button.png") no-repeat center;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+//
+.textBreak{
+	white-space: break-spaces;
+}
+.yell{
+	color: $color_yell;
+}
+.cgrey{
+	color: $color_grey;
+}
+.under{
+	text-decoration: underline;
+}
+
+.admininput{
+	display: flex;
+	.inputName {
+		// color: #D9DADE;
+		margin-bottom: 4px;
+		@include desktop{
+			margin-bottom: 8px;
+		}
+	}
+	input {
+			border: 1px solid #888;
+			background-color: #fff;
+			color: #00070D;
+			padding-left: 20px;
+				@include desktop{
+					padding:4px 12px ;
+
+				}
+	}
+
+	// 인풋 포커싱
+	input:focus{
+		// border-bottom: 1px solid $main_color;
+	}
+	
+	// 플레이스 홀더
+	input::placeholder{
+		color: #81868A;
+		font-weight: 400;
+		@include tablet{
+			font-size: 16px;
+		}
+	}
+
+	// 비활성화 버튼
+	input:disabled{
+		background-color: #E4E4E4;
+		color: #BCBCBC;
+		width: 100%!important;//been
+	}
+
+	textarea{
+		border: 1px solid #D9DADE;
+		border-radius: 10px;
+		background-color:#F2F2F2;;
+		width: 100%;
+		padding:16px;
+		overflow-y: auto;
+		height: 125px;
+		@include desktop{
+			font-size: 16px;
+
+		}
+	}
+	textarea:focus{
+		border: 1px solid $color_main;
+		outline:none
+	}
+	textarea::placeholder{
+		color: #81868A;
+		font-weight: 300;
+		font-size: 16px;
+		// @include tablet{
+		// 	font-size: 14px;
+		// }
+		
+	}
+	button.date{
+		// background: url("~/assets/img/date.png") no-repeat center right 16px;
+		width: 100%;
+	}
+	
+	.search{
+		background: url('~/assets/img/icon/search_icon.png') no-repeat center right 12px /24px 24px;
+		background-color: #F2F2F2;
+			@include desktop{
+			background: url('~/assets/img/icon/search_icon.png') no-repeat center right 16px /24px 24px;
+			}
+	}
+
+	.search_grey{
+		background: url('~/assets/img/icon/search_grey.png') no-repeat center right 12px /24px 24px;
+		background-color: #ededed;
+		@include desktop{
+		background: url('~/assets/img/icon/search_grey.png') no-repeat center right 16px /16px 16px;
+		background-color: #ededed;
+		}
+	}
+
+	//셀렉트 박스
+	select{
+
+		border: 1px solid #888;
+		padding:4px 12px ;
+		width: auto;
+		background: url('~/assets/img/icon/arrow_drop_down.png') no-repeat center right 12px /24px 24px;
+		background-color: #fff;
+		
+		
+	}
+	&.selectBox{
+		position: relative;
+
+		input{
+			width: 100%;
+			background: url('~/assets/img/icon/arrow_drop_down.png') no-repeat center right 12px /24px 24px;
+			background-color: #F2F2F2;
+			@include desktop{
+			background-position: center right 16px;
+			// background-size: 32px 32px;
+			}
+		}
+	
+		ul.select_option{
+			position: absolute;
+			top: 33px;
+			left: 0;
+			z-index: 10;
+			width: 100%;
+			padding-left: 0px;
+			height: 200px;
+			border-radius: 20px;
+			background-color: #fff;
+			box-shadow: 8px 8px 16px rgb(0 0 0 / 5%);
+			overflow-y: scroll;
+			
+				@include desktop{
+				top: 47px;
+				height: 320px;
+				}
+			li{
+				// margin-bottom: 12px;
+				padding: 12px 24px;
+				padding-left: 24px;
+				
+				cursor: pointer;
+				width: 100%;
+				word-break: break-all;
+				@include desktop{
+					font-size: 16px;
+				}
+
+				&:hover{
+					background-color: rgb(0 0 0 / 10%);
+				}
+				&:last-child{
+					margin-bottom: 0;
+				}
+			}
+			.cancel_btn{
+				position: sticky;
+				bottom: 0;
+				left: 0;
+				padding: 4px 8px 4px 0;
+				text-align: right;
+				width: 100%;
+				background-color: #fff;
+			img{
+				width: 24px;
+				height: 24px;
+				@include desktop{
+				width: 32px;
+				height: 32px;
+			}
+			}
+		}
+	}
+}
+label{
+	color:#00070D;
+	
+}
+
+	// 라디오 
+	input[type=radio]{
+		// border: 2px solid #CECECE;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background: url("~/assets/img/icon/radio_button_unchecked.png") no-repeat  center center;
+		width: 24px;
+		height: 24px;
+		border-radius: 100%;
+		padding-left: 0;
+		padding-top: 4px;
+		position: relative;
+		top:4px;
+		&:focus{
+			border: none;
+		}
+	}
+	input[type=radio]:checked{
+			// background:url("~/assets/img/check_box_on.png") center /14px 14px;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			width: 24px;
+			height: 24px;
+			background: url("~/assets/img/icon/radio_button_checked.png") no-repeat center center;
+			// background-color: $main_color;
+			// border: 1px solid $main_color;
+			// border-radius: 100%;
+			padding-left: 0;
+			border-radius: 0;
+			
+			
+	}
+	input[type=radio]:disabled {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 24px;
+		height: 24px;
+		background: url("~/assets/img/icon/radio_button_disabled.png") no-repeat center center / 24px 24px;
+		padding-left: 0;
+		border-radius: 0;
+	}
+   //체크 박스
+	input[type=checkbox]{
+		// border: 2px solid #CECECE;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background: url("~/assets/img/icon/check_box_outline_blank.png") no-repeat center center;
+		width: 16px;
+		height: 16px;
+		border: none;
+		outline: none;
+		// border-radius: 100%;
+		border-radius: 0;
+		padding-left: 0;
+		// padding-top: 4px;
+		position: relative;
+		top:6px;
+		&:focus{
+			border: none;
+		}
+		@include desktop{
+			width: 24px;
+			height: 24px;
+			background: url("~/assets/img/icon/check_box_outline_blank.png") no-repeat center center 24px 24px;
+
+		}
+
+	
+}
+input[type=date]{
+	width: 100%;
+}
+input[type=checkbox]:checked{
+		
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 16px;
+		height: 16px;
+		background: url("~/assets/img/icon/check_box.png") no-repeat center center / 16px 16px;
+		padding-left: 0;
+
+		@include desktop{
+			width: 24px;
+			height: 24px;
+			background: url("~/assets/img/icon/check_box.png") no-repeat center center / 24px 24px;
+		}	
+}
+input[type=checkbox]:disabled{
+		
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 16px;
+		height: 16px;
+		background: url("~/assets/img/icon/check_box_disabled.png") no-repeat center center / 16px 16px;
+		padding-left: 0;
+
+		@include desktop{
+			width: 24px;
+			height: 24px;
+			background: url("~/assets/img/icon/check_box_disabled.png") no-repeat center center / 24px 24px;
+		}	
+}
+
+.input2Box{
+	display: flex;
+	justify-content: space-between;
+
+	input{
+		width: calc(100% - 109px);
+		@include desktop{
+		width: calc(100% - 163px);
+
+		}
+	}
+
+	.inputBtn{
+		width: 101px;
+		height: 33px;
+		padding: 0;
+		font-weight: 300;
+		@include desktop{
+			height: 48px;
+			width: 151px;
+		}
+	}
+}
+
+	}
+
+	.adBtn1{
+		padding: 12px 0;
+		width: 100px;
+		background-color: $main_color;
+		color: #fff;
+		border-radius: 4px;
+		font-weight: 500;
+		text-align: center;
+		// @include desktop{
+		// 	font-size: 14px;
+		// }
+	   }
+	   
+	   //테두리 파랑버튼
+	   .adBtn2{
+		   padding: 11px 0;
+		   width: 100px;
+		   background-color: #fff;
+		   color: #00070D;
+		   border: 1px solid $main_color;
+		   border-radius: 4px;
+		   font-weight: 500;
+		   text-align: center;
+		//    @include desktop{
+		// 	   font-size: 14px;
+		//    }
+		}
+	   
+		.adBtn3{
+		   padding: 12px 0;
+		   width: 100px;
+		   background-color: #FFCF23;
+		   color: #fff;
+		   // border: 1px solid #FFCF23;
+		   border-radius: 4px;
+		   font-weight: 500;
+		//    @include desktop{
+		// 	   font-size: 14px;
+		//    }
+		}
+	   
