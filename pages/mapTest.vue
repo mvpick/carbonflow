@@ -5,7 +5,7 @@
   </template>
 
   <script>
-  import sigungu from '~/assets/data/sigungu.json'
+  import sigungu from '~/json/sigungu.json'
   export default {
     data() {
         return {
