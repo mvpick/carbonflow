@@ -1,10 +1,10 @@
 <template>
     <header id="main_header">
         <div class="pc_header">
-            <p>LOGO</p>
+            <p @click="$router.push('/')">LOGO</p>
         </div>
         <div class="mobile_header">
-            <p>LOGO</p>
+            <p @click="$router.push('/')">LOGO</p>
         </div>
     </header>
 </template>
@@ -32,6 +32,7 @@ data() {
         p{
             font-size: 24px;
             font-weight: bold;
+            cursor: pointer;
         }
         @include desktop{
             display: block;
@@ -43,6 +44,7 @@ data() {
         p{
             font-size: 20px;
             font-weight: bold;
+            cursor: pointer;
         }
         @include desktop{
             display: none;

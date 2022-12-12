@@ -11,14 +11,10 @@
         </section>
         
         <div class="industry" v-if="on_tab==0">
-            <div class="chart_box">
-            </div>
 
         </div>
         <div class="year" v-if="on_tab==1">
-            <div class="chart_box">
-                
-            </div>
+            
         </div>
     </div>
 </div>
@@ -39,7 +35,8 @@ data() {
     .tab_section{
         margin-bottom: 40px;
     }
-    .chart_box{
+    .industry,
+    .year{
         padding: 16px;
         box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
         border-radius: 4px;
