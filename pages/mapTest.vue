@@ -1,5 +1,7 @@
 <template>
     <div>
+        <button @click="drawMarker">마커하나찍기</button>
+        <button @click="onClickCompany">참여기업수</button>
         <div id="map" style="width: 1000px; height: 800px"></div>
     </div>
   </template>
@@ -11,7 +13,10 @@
         return {
             map: null,
             sigungu: null,
-            coordinates: []
+            coordinates: [],
+
+            markers: [],
+
         }
     },
     mounted() {
@@ -26,14 +31,66 @@
         kakao.maps.load(this.initMap)
     },
     methods: {
+        onClickCompany() {
+            
+        },
+
+        // 마커를 생성하고 지도위에 표시하는 함수입니다
+        addMarker(position) {
+            
+            // 마커를 생성합니다
+            var marker = new kakao.maps.Marker({
+                position: position
+            });
+
+            // 마커가 지도 위에 표시되도록 설정합니다
+            marker.setMap(map);
+            
+            // 생성된 마커를 배열에 추가합니다
+            markers.push(marker);
+        },
+        
+        drawMarker() {
+            let geocoder = new kakao.maps.services.Geocoder()
+            let _this = this
+            geocoder.addressSearch(
+                "제주특별자치도 제주시 첨단로 242", // 주소
+                function (result, status) {
+                    if (status === kakao.maps.services.Status.OK) { // 검색완료
+
+                        var position = new kakao.maps.LatLng(result[0].y, result[0].x) // 위치 생성
+
+                        var marker = new kakao.maps.Marker({ // 마커 객체 생성
+                            position: position,
+                            clickable: true
+                        })
+
+                        marker.setMap(_this.map) // 마커 찍기
+
+                        var iwContent = '<div style="padding:5px;">데이터</div>', // 인포윈도우에 내용
+                        iwRemoveable = true // x 버튼
+
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content : iwContent,
+                            removable : iwRemoveable
+                        })
+
+                        kakao.maps.event.addListener(marker, 'click', function() { // 인포윈도우 이벤트
+                            infowindow.open(_this.map, marker)
+                        })
+
+                        _this.map.setCenter(position) // 지도 중심 마커로 이동
+                    }
+
+                }
+            )
+        },
         initMap() {
             const container = document.getElementById("map") // DOM 레퍼런스
-
             const options = {
                 center: new kakao.maps.LatLng(38.072648233869785, 127.60472638427933), // 중심좌표
-                level: 5, // 확대, 축소
+                level: 12, // 확대, 축소
             }
-
             let map = new kakao.maps.Map(container, options) // 지도 생성
             this.map = map
 
@@ -54,35 +111,6 @@
             })
 
             polygon.setMap(map)
-
-            // let geocoder = new kakao.maps.services.Geocoder()
-            // console.log(geocoder)
-
-
-            // geocoder.addressSearch(
-            //     "제주특별자치도 제주시 첨단로 242", // 주소
-            //     function (result, status) {
-            //         // console.log(result)
-            //         // console.log(status)
-            //         if (status === kakao.maps.services.Status.OK) { // 정상적으로 검색이 완료됐으면
-            //             var coords = new kakao.maps.LatLng(result[0].y, result[0].x)
-
-            //             var marker = new kakao.maps.Marker({ // 정상적으로 검색이 완료됐으면
-            //                 map: map,
-            //                 position: coords,
-            //             })
-
-            //             var infowindow = new kakao.maps.InfoWindow({ // 인포윈도우로 장소에 대한 설명을 표시
-            //                 content:
-            //                     '<div style="width:150px;text-align:center;padding:6px 0;">Kakao</div>',
-            //             })
-            //             infowindow.open(map, marker)
-
-            //             map.setCenter(coords) // 지도의 중심을 결과값으로 받은 위치로 이동
-            //         }
-
-            //     }
-            // )
 
         },
     },
