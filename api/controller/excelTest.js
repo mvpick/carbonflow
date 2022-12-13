@@ -79,7 +79,7 @@ export const upload = async (req, res) => {
 
     const convertedJSON = JSON.stringify(excelData); // JSON파일 생성을 위해 JSON 문자열로 변환
 
-    fs.writeFileSync('json/excelData.json', convertedJSON, (err) => { // JSON파일 생성
+    fs.writeFileSync('json/excel_data.json', convertedJSON, (err) => { // JSON파일 생성
       console.error(err);
       throw new Error('json 파일 생성 실패')
     })
