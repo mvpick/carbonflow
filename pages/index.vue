@@ -60,7 +60,7 @@
                     <div class="button">
                         <button class="mainBtn2" @click="onRegionEmission()">지역배출량</button>
                         <button class="mainBtn2" @click="onRegionVariation()">증감량</button>
-                        <button class="mainBtn2">참여기업수</button>
+                        <button class="mainBtn2" @click="onCompanyNumber()">참여기업수</button>
                         <button class="mainBtn1">국제배출량 순위</button>
                     </div>
                 </div>
@@ -134,14 +134,17 @@ import sido from '~/json/sido.json' // 지역 위경도
 export default {
     data() {
         return {
-            button_box:false,
-            chart_modal:false,
-            table_modal:false,
+            button_box: false,
+            chart_modal: true,
+            table_modal: true,
             on_tab:0,
 
             map: null,
             polygons: [],
             polygonStatus: 0, // 0: 빈화면, 1: 지역배출량, 2: 증감량
+            markers: [], // 마커 표현 데이터
+            markerStatus: 0, // 0: 빈화면, 1: 마커표시
+            infowindows: [],
 
             region: [
                 { name: '서울특별시', value: 12324706 },
@@ -183,7 +186,12 @@ export default {
                 { name: '제주특별자치도', value: true },
             ],
 
-            markers: [], // 마커 표현 데이터
+            company: [
+                { name: '(유)에스케이씨에보닉페록사이드코리아', address: '울산광역시 남구 상개로 99(상개동)', value: 57349, year: 2021, },
+                { name: '(주)HJ매그놀리아용평호텔앤리조트', address: '강원도 평창군 대관령면 올림픽로 715', value: 33424, year: 2021, },
+                { name: '(주)MSC', address: '경상남도 양산시 소주회야로 45-73', value: 29558, year: 2021, },
+            ],
+
             
         }
     },
@@ -202,34 +210,77 @@ export default {
             this.map = map
         },
 
+        drawMarker() {
+            console.log('call on company')
+            let geocoder = new kakao.maps.services.Geocoder()
+            const _this = this
+
+            this.company.map(company => {
+                geocoder.addressSearch(company.address, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) { // 정상적으로 검색이 완료됐으면 
+                        let coords = new kakao.maps.LatLng(result[0].y, result[0].x)
+                        let marker = new kakao.maps.Marker({ // 결과값으로 받은 위치를 마커로 표시합니다
+                            map: _this.map,
+                            position: coords
+                        })
+                        let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우로 장소에 대한 설명을 표시합니다
+                            content: `
+                                <div style="width:150px;text-align:center;padding:6px 0;">
+                                    ${company.name}  / ${company.value} / ${company.year}
+                                </div>
+                            `
+                        })
+                        _this.infowindows.push(infowindow)
+                        infowindow.open(_this.map, marker)
+                        _this.markers.push(marker)
+                        _this.markerStatus = 1
+                    } 
+                })  
+            })
+            
+        },
+
+        eraseMarker() {
+            this.markers.map(marker => { marker.setMap(null) })
+            this.markerStatus = 0
+            this.markers = []
+
+            this.infowindows.map(infowindow => { infowindow.close() })
+            this.infowindows = []
+        },
+
+        onCompanyNumber() {
+            if(this.markerStatus === 0) {
+                this.drawMarker()
+            } else if(this.markerStatus === 1) {
+                this.eraseMarker()
+            }
+        },
+
         onRegionEmission() {
             if(this.polygonStatus === 0) {
                 this.drawPolygon(1)
             } else if(this.polygonStatus === 1) {
-                this.deletePolygon()
+                this.erasePolygon()
             } else if (this.polygonStatus === 2) {
-                this.deletePolygon()
+                this.erasePolygon()
                 this.drawPolygon(1)
             }
         },
-
         onRegionVariation() {
             if(this.polygonStatus === 0) {
                 this.drawPolygon(2)
             } else if(this.polygonStatus === 1) {
-                this.deletePolygon()
+                this.erasePolygon()
                 this.drawPolygon(2)
             } else if (this.polygonStatus === 2) {
-                this.deletePolygon()
+                this.erasePolygon()
             }
         },
 
-        
-
         drawPolygon(type) { // type = 1 : 지역배출량, 2: 증감량
-            
-            // 시도 데이터 배열 생성
-            const sido_array = sido.features
+
+            const sido_array = sido.features // 시도 데이터 배열 생성
             let regionPolygonData = []
             sido_array.map(item => {
                 let value 
@@ -245,8 +296,7 @@ export default {
                 })
             })
 
-            // 폴리곤 생성 및 배열에 담기
-            regionPolygonData.map((region) => {
+            regionPolygonData.map((region) => { // 폴리곤 생성 및 배열에 담기
                 region.coordinates.map((polygonCoordinates) => {
                     let polygonPath = []
                     polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
@@ -273,9 +323,7 @@ export default {
 
         getColorFromEmission(value) { // 색깔 생성기
             let emissions = []
-            this.region.map(region => {
-                emissions.push(region.value)
-            })
+            this.region.map(region => { emissions.push(region.value) })
             const maxValue = Math.max.apply(null, emissions)
             const unit = Math.ceil(maxValue / 4) 
 
@@ -304,7 +352,7 @@ export default {
             }
         },
 
-        deletePolygon() {
+        erasePolygon() {
             this.polygons.map(polygon => { polygon.setMap(null) })
             this.polygonStatus = 0
             this.polygons = []
