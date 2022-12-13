@@ -310,7 +310,7 @@ export default {
                         strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
                         strokeStyle: 'longdash', // 선의 스타일입니다
                         fillColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 채우기 색깔입니다
-                        fillOpacity: 0.6 // 채우기 불투명도 입니다
+                        fillOpacity: 0.4 // 채우기 불투명도 입니다
                     })
                     this.polygons.push(polygon)
                 })
