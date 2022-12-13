@@ -9,7 +9,16 @@ APP_ENVIRONMENT=dev
 APP_PORT=3000
 APP_HOST=localhost
 
+APP_ENVIRONMENT=development
+
 # KAKAO
-KAKAO_KEY=f1b22e912c8c8a6feeb897897072857e
+KAKAO_KEY=40b8fc94c32c1ff8fa408440485e6caa
+
+# DATABASE
+DB_USERNAME=admin
+DB_PASSWORD=eventcon!A
+DB_DATABASE=carbonflow
+DB_HOST=eventdb.cazhs06fbmc0.ap-northeast-2.rds.amazonaws.com
+
 
 ```

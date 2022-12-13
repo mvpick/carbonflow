@@ -1,4 +1,3 @@
-import { assert } from 'console';
 import excelToJson from 'convert-excel-to-json';
 import fs from 'fs';
 
@@ -6,7 +5,7 @@ export const upload = async (req, res) => {
   try {
     const file = req.file; // 어드민이 업로드한 파일
     const selectedYear = req.body.selectedYear; // 어드민이 선택한 연도
-    const excelData = JSON.parse(fs.readFileSync('json/excelData.json', { encoding: 'utf8', flag: 'r' }));
+    const excelData = JSON.parse(fs.readFileSync('json/excel_data.json', { encoding: 'utf8', flag: 'r' }));
 
     fs.readdir( "static/files", function( error, filelist ) { // 최신파일 유지
       for(let i = 0; i < filelist.length - 1; i++) {
