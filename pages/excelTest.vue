@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import excelData from '/json/excelData.json'
+  import excelData from '/json/excel_data.json'
   export default {
     data() {
       return {
