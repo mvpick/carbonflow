@@ -5,11 +5,9 @@
 
 ```bash
 # APP
-APP_ENVIRONMENT=dev
+APP_ENVIRONMENT=development
 APP_PORT=3000
 APP_HOST=localhost
-
-APP_ENVIRONMENT=development
 
 # KAKAO
 KAKAO_KEY=40b8fc94c32c1ff8fa408440485e6caa
