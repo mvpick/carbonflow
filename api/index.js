@@ -14,7 +14,7 @@ sequelize.authenticate()
 sequelize.sync()
 .then(() => {
     console.log('DB SYNC SUCCESS')
-    if (process.env.APP_ENVIRONMENT === 'development') {
+    if (process.env.APP_ENVIRONMENT === 'dev') {
         seed() // seed DB initialization
     }
 })
