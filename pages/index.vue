@@ -59,7 +59,7 @@
                     </div>
                     <div class="button">
                         <button class="mainBtn2" @click="onRegionEmission()">지역배출량</button>
-                        <button class="mainBtn2">증감량</button>
+                        <button class="mainBtn2" @click="onRegionVariation()">증감량</button>
                         <button class="mainBtn2">참여기업수</button>
                         <button class="mainBtn1">국제배출량 순위</button>
                     </div>
@@ -130,7 +130,6 @@
 </template>
 
 <script>
-import { throws } from 'assert'
 import sido from '~/json/sido.json' // 지역 위경도
 export default {
     data() {
@@ -139,6 +138,10 @@ export default {
             chart_modal:false,
             table_modal:false,
             on_tab:0,
+
+            map: null,
+            polygons: [],
+            polygonStatus: 0, // 0: 빈화면, 1: 지역배출량, 2: 증감량
 
             region: [
                 { name: '서울특별시', value: 12324706 },
@@ -160,13 +163,27 @@ export default {
                 { name: '제주특별자치도', value: 1584366 },
             ],
 
-            map: null,
-            regionEmission: [], // 지역배출량 표현 데이터
-            regionEmissionStatus: false, // 지역배출량 그래프 상태
-            polygons: [],
+            variation: [
+                { name: '서울특별시', value: true },
+                { name: '부산광역시', value: false },
+                { name: '대구광역시', value: true },
+                { name: '인천광역시', value: false },
+                { name: '광주광역시', value: true },
+                { name: '대전광역시', value: false },
+                { name: '울산광역시', value: true },
+                { name: '세종특별자치시', value: false },
+                { name: '경기도', value: true },
+                { name: '강원도', value: false },
+                { name: '충청북도', value: true },
+                { name: '충청남도', value: false },
+                { name: '전라북도', value: true },
+                { name: '전라남도', value: false },
+                { name: '경상북도', value: true },
+                { name: '경상남도', value: false },
+                { name: '제주특별자치도', value: true },
+            ],
 
             markers: [], // 마커 표현 데이터
-
             
         }
     },
@@ -185,6 +202,75 @@ export default {
             this.map = map
         },
 
+        onRegionEmission() {
+            if(this.polygonStatus === 0) {
+                this.drawPolygon(1)
+            } else if(this.polygonStatus === 1) {
+                this.deletePolygon()
+            } else if (this.polygonStatus === 2) {
+                this.deletePolygon()
+                this.drawPolygon(1)
+            }
+        },
+
+        onRegionVariation() {
+            if(this.polygonStatus === 0) {
+                this.drawPolygon(2)
+            } else if(this.polygonStatus === 1) {
+                this.deletePolygon()
+                this.drawPolygon(2)
+            } else if (this.polygonStatus === 2) {
+                this.deletePolygon()
+            }
+        },
+
+        
+
+        drawPolygon(type) { // type = 1 : 지역배출량, 2: 증감량
+            
+            // 시도 데이터 배열 생성
+            const sido_array = sido.features
+            let regionPolygonData = []
+            sido_array.map(item => {
+                let value 
+                if(type === 1) {
+                    value = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                } else if (type === 2) {
+                    value = this.variation.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                }
+                regionPolygonData.push({
+                    regionName: item.properties.CTP_KOR_NM,
+                    coordinates: item.geometry.coordinates,
+                    value,
+                })
+            })
+
+            // 폴리곤 생성 및 배열에 담기
+            regionPolygonData.map((region) => {
+                region.coordinates.map((polygonCoordinates) => {
+                    let polygonPath = []
+                    polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
+                        const latLng = new kakao.maps.LatLng(coordinate[1], coordinate[0])
+                        polygonPath.push(latLng)
+                    })
+                    let polygon = new kakao.maps.Polygon({
+                        path:polygonPath, // 그려질 다각형의 좌표 배열입니다
+                        strokeWeight: 3, // 선의 두께입니다
+                        strokeColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 선의 색깔입니다
+                        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+                        strokeStyle: 'longdash', // 선의 스타일입니다
+                        fillColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 채우기 색깔입니다
+                        fillOpacity: 0.6 // 채우기 불투명도 입니다
+                    })
+                    this.polygons.push(polygon)
+                })
+            })
+
+            // 지도에 표시
+            this.polygons.map(polygon => { polygon.setMap(this.map) })
+            this.polygonStatus = type
+        },
+
         getColorFromEmission(value) { // 색깔 생성기
             let emissions = []
             this.region.map(region => {
@@ -192,7 +278,6 @@ export default {
             })
             const maxValue = Math.max.apply(null, emissions)
             const unit = Math.ceil(maxValue / 4) 
-            console.log(unit)
 
             const lv1_min = 0
             const lv2_min = unit
@@ -211,93 +296,21 @@ export default {
             }
         },
 
-        onRegionEmission() {
-            if(!this.regionEmissionStatus) {
-
-                // 시도 데이터 배열 생성
-                const sido_array = sido.features
-                sido_array.map(item => {
-                    const emission = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
-                    this.regionEmission.push({
-                        regionName: item.properties.CTP_KOR_NM,
-                        emission,
-                        coordinates: item.geometry.coordinates,
-                    })
-                })
-
-                // 폴리곤 생성 및 배열에 담기
-                this.regionEmission.map((region, index) => {
-                    region.coordinates.map((polygonCoordinates) => {
-                        let polygonPath = []
-                        polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
-                            const latLng = new kakao.maps.LatLng(coordinate[1], coordinate[0])
-                            polygonPath.push(latLng)
-                        })
-                        let polygon = new kakao.maps.Polygon({
-                            path:polygonPath, // 그려질 다각형의 좌표 배열입니다
-                            strokeWeight: 3, // 선의 두께입니다
-                            strokeColor: this.getColorFromEmission(region.emission), // 선의 색깔입니다
-                            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-                            strokeStyle: 'longdash', // 선의 스타일입니다
-                            fillColor: this.getColorFromEmission(region.emission), // 채우기 색깔입니다
-                            fillOpacity: 0.6 // 채우기 불투명도 입니다
-                        })
-                        this.polygons.push(polygon)
-                    })
-                })
-
-                // 지도에 표시
-                this.polygons.map(polygon => { polygon.setMap(this.map) })
-
-                // 지역배출량 상태 true
-                this.regionEmissionStatus = true
-
-            } else if(this.regionEmissionStatus) {
-                // 지도에서 삭제
-                this.polygons.map(polygon => { polygon.setMap(null) })
-
-                // 초기화
-                this.regionEmissionStatus = false
-                this.polygons = []
-                this.regionEmission = []
+        getColorFromVariation(value) { // 색깔 생성기
+            if (value) {
+                return '#FF5C00'
+            } else if (!value) {
+                return '#3091EB'
             }
         },
 
-        createRegionEmission() { // 지역배출량 배열 생성
-            const sido_array = sido.features
-            sido_array.map(item => {
-                console.log(item)
-                this.regionEmission.push({
-                    regionName: item.properties.CTP_KOR_NM,
-                    emission: this.region[item.properties.CTP_KOR_NM],
-                    coordinates: item.geometry.coordinates
-                })
-            })
-
+        deletePolygon() {
+            this.polygons.map(polygon => { polygon.setMap(null) })
+            this.polygonStatus = 0
+            this.polygons = []
         },
 
-        drawRegionEmission() { // 지역배출량 지도 표시
-            this.regionEmission.map((region, index) => {
-                region.coordinates.map((polygonCoordinates) => {
-                    let polygonPath = []
-                    polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
-                        const latLng = new kakao.maps.LatLng(coordinate[1], coordinate[0])
-                        polygonPath.push(latLng)
-                    })
-                    let polygon = new kakao.maps.Polygon({
-                        path:polygonPath, // 그려질 다각형의 좌표 배열입니다
-                        strokeWeight: 3, // 선의 두께입니다
-                        strokeColor: '#ff0000', // 선의 색깔입니다
-                        strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-                        strokeStyle: 'longdash', // 선의 스타일입니다
-                        fillColor: '#ff0000', // 채우기 색깔입니다
-                        fillOpacity: 0.2 + ( 0.5 * (index + 1) / 17 ) // 채우기 불투명도 입니다
-                    })
-                    polygon.setMap(this.map)
-                })
-             
-            })
-        },
+        
     }
 }
 </script>
