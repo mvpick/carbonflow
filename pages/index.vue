@@ -2,8 +2,11 @@
 <div id="index">
     
     <div class="map-wrapper">
+
+        <!-- 지도 -->
         <div id="map"></div>
 
+        <!-- 모바일메뉴 -->
         <div class="mobile_menubox">
             <button class="menu" @click="button_box=true">
                 <img src="~assets/img/icon/menu.png" alt="">
@@ -18,6 +21,12 @@
                         <option value="">2020년</option>
                         <option value="">2019년</option>
                         <option value="">2018년</option>
+                        <option value="">2017년</option>
+                        <option value="">2016년</option>
+                        <option value="">2015년</option>
+                        <option value="">2014년</option>
+                        <option value="">2013년</option>
+                        <option value="">2012년</option>
                     </select>
                 </div>
                 <div class="button">
@@ -29,6 +38,7 @@
             </div>
         </div>
 
+        <!-- PC메뉴 -->
         <div class="pc_menubox">
             <div class="option_box">
                 <div class="button_box">
@@ -39,10 +49,16 @@
                             <option value="">2020년</option>
                             <option value="">2019년</option>
                             <option value="">2018년</option>
+                            <option value="">2017년</option>
+                            <option value="">2016년</option>
+                            <option value="">2015년</option>
+                            <option value="">2014년</option>
+                            <option value="">2013년</option>
+                            <option value="">2012년</option>
                         </select>
                     </div>
                     <div class="button">
-                        <button class="mainBtn2">지역배출량</button>
+                        <button class="mainBtn2" @click="onRegionEmission()">지역배출량</button>
                         <button class="mainBtn2">증감량</button>
                         <button class="mainBtn2">참여기업수</button>
                         <button class="mainBtn1">국제배출량 순위</button>
@@ -114,7 +130,8 @@
 </template>
 
 <script>
-import sido from '~/json/sido.json'
+import { throws } from 'assert'
+import sido from '~/json/sido.json' // 지역 위경도
 export default {
     data() {
         return {
@@ -123,42 +140,128 @@ export default {
             table_modal:false,
             on_tab:0,
 
-            region: {
-                '서울특별시': 12324706,
-                '부산광역시': 6787007,
-                '대구광역시': 3697602,
-                '인천광역시': 45126832,
-                '광주광역시': 1443049,
-                '대전광역시': 3867799,
-                '울산광역시': 47203695,
-                '세종특별자치시': 2245895,
-                '경기도': 62896149,
-                '강원도': 44206196,
-                '충청북도': 21256076,
-                '충청남도':	141911607,
-                '전라북도':	13578538,
-                '전라남도':	93199097,
-                '경상북도':	50697916,
-                '경상남도':	35581389,
-                '제주특별자치도': 1584366
-            },
+            region: [
+                { name: '서울특별시', value: 12324706 },
+                { name: '부산광역시', value: 6787007 },
+                { name: '대구광역시', value: 3697602 },
+                { name: '인천광역시', value: 45126832 },
+                { name: '광주광역시', value: 1443049 },
+                { name: '대전광역시', value: 3867799 },
+                { name: '울산광역시', value: 47203695 },
+                { name: '세종특별자치시', value: 2245895 },
+                { name: '경기도', value: 62896149 },
+                { name: '강원도', value: 44206196 },
+                { name: '충청북도', value: 21256076 },
+                { name: '충청남도', value: 141911607 },
+                { name: '전라북도', value: 13578538 },
+                { name: '전라남도', value: 93199097 },
+                { name: '경상북도', value: 50697916 },
+                { name: '경상남도', value: 35581389 },
+                { name: '제주특별자치도', value: 1584366 },
+            ],
 
             map: null,
-            sigungu: null,
-            sido: null,
-            coordinates: [],
+            regionEmission: [], // 지역배출량 표현 데이터
+            regionEmissionStatus: false, // 지역배출량 그래프 상태
+            polygons: [],
 
-            markers: [],
+            markers: [], // 마커 표현 데이터
 
-            regionEmission: []
+            
         }
     },
     mounted() {
-        kakao.maps.load(this.initMap)
-        this.createRegionEmission()
-        this.drawRegionEmission()
+        kakao.maps.load(this.initMap())
     },
     methods: {
+
+        initMap() { // 맵 세팅
+            const container = document.getElementById("map") // DOM 레퍼런스
+            const options = {
+                center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
+                level: 12, // 확대, 축소
+            }
+            let map = new kakao.maps.Map(container, options) // 지도 생성
+            this.map = map
+        },
+
+        getColorFromEmission(value) { // 색깔 생성기
+            let emissions = []
+            this.region.map(region => {
+                emissions.push(region.value)
+            })
+            const maxValue = Math.max.apply(null, emissions)
+            const unit = Math.ceil(maxValue / 4) 
+            console.log(unit)
+
+            const lv1_min = 0
+            const lv2_min = unit
+            const lv3_min = unit * 2
+            const lv4_min = unit * 3
+            const lv4_max = unit * 4
+
+            if (value >= lv1_min && value < lv2_min) {
+                return '#27D1BD'
+            } else if (value >= lv2_min && value < lv3_min) {
+                return '#FFD600'
+            } else if (value >= lv3_min && value < lv4_min) {
+                return '#FF9900'
+            } else if (value >= lv4_min && value < lv4_max) {
+                return '#FF4D00'
+            }
+        },
+
+        onRegionEmission() {
+            if(!this.regionEmissionStatus) {
+
+                // 시도 데이터 배열 생성
+                const sido_array = sido.features
+                sido_array.map(item => {
+                    const emission = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                    this.regionEmission.push({
+                        regionName: item.properties.CTP_KOR_NM,
+                        emission,
+                        coordinates: item.geometry.coordinates,
+                    })
+                })
+
+                // 폴리곤 생성 및 배열에 담기
+                this.regionEmission.map((region, index) => {
+                    region.coordinates.map((polygonCoordinates) => {
+                        let polygonPath = []
+                        polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
+                            const latLng = new kakao.maps.LatLng(coordinate[1], coordinate[0])
+                            polygonPath.push(latLng)
+                        })
+                        let polygon = new kakao.maps.Polygon({
+                            path:polygonPath, // 그려질 다각형의 좌표 배열입니다
+                            strokeWeight: 3, // 선의 두께입니다
+                            strokeColor: this.getColorFromEmission(region.emission), // 선의 색깔입니다
+                            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+                            strokeStyle: 'longdash', // 선의 스타일입니다
+                            fillColor: this.getColorFromEmission(region.emission), // 채우기 색깔입니다
+                            fillOpacity: 0.6 // 채우기 불투명도 입니다
+                        })
+                        this.polygons.push(polygon)
+                    })
+                })
+
+                // 지도에 표시
+                this.polygons.map(polygon => { polygon.setMap(this.map) })
+
+                // 지역배출량 상태 true
+                this.regionEmissionStatus = true
+
+            } else if(this.regionEmissionStatus) {
+                // 지도에서 삭제
+                this.polygons.map(polygon => { polygon.setMap(null) })
+
+                // 초기화
+                this.regionEmissionStatus = false
+                this.polygons = []
+                this.regionEmission = []
+            }
+        },
 
         createRegionEmission() { // 지역배출량 배열 생성
             const sido_array = sido.features
@@ -170,7 +273,7 @@ export default {
                     coordinates: item.geometry.coordinates
                 })
             })
-            console.log(this.regionEmission)
+
         },
 
         drawRegionEmission() { // 지역배출량 지도 표시
@@ -194,16 +297,6 @@ export default {
                 })
              
             })
-        },
-
-        initMap() {
-            const container = document.getElementById("map") // DOM 레퍼런스
-            const options = {
-                center: new kakao.maps.LatLng(38.072648233869785, 127.60472638427933), // 중심좌표
-                level: 12, // 확대, 축소
-            }
-            let map = new kakao.maps.Map(container, options) // 지도 생성
-            this.map = map
         },
     }
 }
