@@ -10,6 +10,7 @@
         <div class="mobile_menubox">
             <button class="menu" @click="button_box=true">
                 <img src="~assets/img/icon/menu.png" alt="">
+                
             </button>
 
             <div class="button_box" v-if="button_box">
@@ -218,11 +219,26 @@ export default {
             this.company.map(company => {
                 geocoder.addressSearch(company.address, function(result, status) {
                     if (status === kakao.maps.services.Status.OK) { // 정상적으로 검색이 완료됐으면 
-                        let coords = new kakao.maps.LatLng(result[0].y, result[0].x)
-                        let marker = new kakao.maps.Marker({ // 결과값으로 받은 위치를 마커로 표시합니다
-                            map: _this.map,
-                            position: coords
+
+
+                        let position = new kakao.maps.LatLng(result[0].y, result[0].x)
+
+                        let markerImageSrc = "images/markerCo2.png"
+                        let imageSize = new kakao.maps.Size(18, 24)
+                        let imageOptions = {}
+                        let markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOptions)
+
+                        let marker = new kakao.maps.Marker({
+                            position: position,
+                            image: markerImage
                         })
+
+                        marker.setMap(_this.map)
+
+                        // let marker = new kakao.maps.Marker({ // 결과값으로 받은 위치를 마커로 표시합니다
+                        //     map: _this.map,
+                        //     position: coords
+                        // })
                         let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우로 장소에 대한 설명을 표시합니다
                             content: `
                                 <div style="width:150px;text-align:center;padding:6px 0;">
