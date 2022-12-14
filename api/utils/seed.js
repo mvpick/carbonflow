@@ -40,7 +40,7 @@ export async function seed() {
       // 지역 시드 생성
       const find_region = await Region.findAll()
       if(find_region.length === 0) {
-        for(const region of region_data) {
+        for await(const region of region_data) {
           await Region.create({ name: region })
         }
       }
@@ -50,7 +50,7 @@ export async function seed() {
       // 연도 생성
       const find_year = await Year.findAll();
       if(find_year.length === 0) {
-        for(const year of year_data) {
+        for await(const year of year_data) {
           await Year.create({ name: year });
         }
       }

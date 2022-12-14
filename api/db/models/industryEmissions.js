@@ -9,32 +9,32 @@ module.exports = (sequelize, DataTypes) => {
         },
         yearId : {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: '연도'
         },
         energy : {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: '에너지'
         },
         process : {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: '산업공정'
         },
         agriculture : {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: '농업'
         },
         lulucf : {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: 'LULUCF'
         },
         waste : {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: '폐기물'
         }
     }, {

@@ -19,35 +19,57 @@ export const yearIndustry = async(req, res) => {
     const sheetNames = excelFile.SheetNames;
     const sheets = sheetNames.map(item => excelFile.Sheets[item]);
     const deleteKeys = ['구분', '분야·부문/연도'];
+    const industryColumns = ['energy', 'process', 'agriculture', 'lulucf', 'waste'];
 
     const result = sheets.map(item => excelFilter(item, deleteKeys));
     const yearData = result[0][0];
     const industryData = result[1];
 
 
+// 연도별 배출량
+  // await YearEmissions.destroy({
+  //   truncate: true
+  // })
 
-  await YearEmissions.destroy({
-    truncate: true
-  })
+  //  for await(let item of Object.entries(yearData)) {
+  //   const findId = await Year.findOne({
+  //     attributes: ['id'],
+  //     where: {
+  //       name: item[0]
+  //     }
+  //   });
 
-   for await(let item of Object.entries(yearData)) {
-    const findId = await Year.findOne({
-      attributes: ['id'],
-      where: {
-        name: item[0]
-      }
-    });
+  //   await YearEmissions.create({
+  //     yearId: findId.id,
+  //     value: item[1]
+  //   })
+  //  }
 
-    await YearEmissions.create({
-      yearId: findId.id,
-      value: item[1]
+
+// 산업별 배출량
+    await IndustryEmissions.destroy({
+      truncate: true
     })
-   }
 
+    for(let item of Object.entries(industryData[0])) {
+      const findId = await Year.findOne({
+        attributes: ['id'],
+        where: {
+          name: item[0]
+        }
+      });
 
-   for await(let item of Object.entries(industryData)) {
-    console.log(item)
-   }
+      await IndustryEmissions.create({
+        yearId: findId.id,
+        energy: item[1]
+      })
+    }
+
+    console.log(industryData)
+
+  //  for await(let item of Object.entries(industryData)) {
+  //   console.log(item)
+  //  }
 
 
     return res.status(200).send({
