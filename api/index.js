@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const { sequelize } = require('./models/index.js')
+const { sequelize } = require('./db//models/index.js')
 const { seed } = require('./utils/seed')
 
 // --------------------------- 시퀄라이즈 -------------------------//
@@ -14,7 +14,7 @@ sequelize.authenticate()
 sequelize.sync()
 .then(() => {
     console.log('DB SYNC SUCCESS')
-    if (process.env.APP_ENVIRONMENT === 'dev') {
+    if (process.env.APP_ENVIRONMENT === 'development') {
         seed() // seed DB initialization
     }
 })
@@ -40,7 +40,7 @@ app.all('/*', function (req, res, next) {
 })
 
 // all router
-app.use('/excelTest', require('./router/excelTest.js')) // free
+app.use('/excelUpload', require('./router/excelUpload.js')) // free
 
 
 module.exports = {

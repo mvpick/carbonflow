@@ -11,6 +11,7 @@
         </section>
 
         <div class="industry" v-if="on_tab==0">
+          <PieChart :data="pieChartData" :options="pieChartOptions" />
         </div>
         <div class="year" v-if="on_tab==1">
           <BarChart :data="barChartData" :options="barChartOptions" />
@@ -23,29 +24,39 @@
 export default{
 data() {
   return{
-      on_tab:0,
+      on_tab: 0,
+      pieChartData: {
+        labels: ['Red', 'Orange', 'Yellow', 'Green', 'Blue'],
+        datasets: [
+          {
+            label: 'Dataset 1',
+            data: [100,200,-300,400, 500],
+            backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
+          }
+        ]
+      },
       barChartData: {
-        labels: [
-          "2019-06",
-          "2019-07",
-          "2019-08",
-          "2019-09",
-          "2019-10",
-          "2019-11",
-          "2019-12",
-          "2020-01",
-          "2020-02",
-          "2020-03",
-        ],
+        labels: ["2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11"],
         datasets: [
           {
             label: "Visualizaciones",
-            data: [2, 1, 16, 3, 4, 5, 0, 0, 4, 12, 2],
+            data: [2, 1, 16, 3, 4, 5],
             backgroundColor: "rgba(20, 255, 0, 0.3)",
             borderColor: "rgba(100, 255, 0, 1)",
             borderWidth: 2,
           },
         ],
+      },
+      pieChartOptions: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: false
+          }
+        }
       },
       barChartOptions: {
         responsive: true,
@@ -53,10 +64,7 @@ data() {
           display: false,
         },
         title: {
-          display: true,
-          text: "Google analytics data",
-          fontSize: 24,
-          fontColor: "#6b7280",
+          display: false
         },
         tooltips: {
           backgroundColor: "#17BF62",

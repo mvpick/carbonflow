@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
     const year = sequelize.define('year', {
-        idx : {
+        id : {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
@@ -15,11 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'year',
     })
-    year.associate = function(models){
-        // file.belongsTo(models.school, {
-        //     foreignKey: 'school_idx',
-        //     onDelete: 'CASCADE',
-        // })
-    }
     return year
 }
+
+
