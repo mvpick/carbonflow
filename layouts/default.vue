@@ -5,12 +5,15 @@
         <nav class="menu">
             <button @click="$router.push('/chart')">
                 <img src="~assets/img/icon/chart.png" alt="">
+                <p>차트</p>
             </button>
             <button @click="$router.push('/')">
                 <img src="~assets/img/icon/map.png" alt="">
+                <p>지도</p>
             </button>
             <button @click="$router.push('/table')">
                 <img src="~assets/img/icon/table.png" alt="">
+                <p>통계</p>
             </button>
         </nav>
     </div>
@@ -41,6 +44,12 @@ export default {
     background-color: white;
     @include desktop{
         display: none;
+    }
+    button{
+        p{
+            font-size: 14px;
+            margin-top: 6px;
+        }
     }
 }
 </style>
