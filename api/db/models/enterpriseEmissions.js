@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
           comment: '소재지'
         }
     }, {
-        tableName: 'regionEmissions',
+        tableName: 'enterpriseEmissions',
     })
     enterpriseEmissions.associate = function(models){
       enterpriseEmissions.belongsTo(models.year, {
