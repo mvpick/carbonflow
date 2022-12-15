@@ -41,6 +41,7 @@ app.all('/*', function (req, res, next) {
 
 // all router
 app.use('/excelUpload', require('./router/excelUpload.js')) // free
+app.use('/allData', require('./router/allData.js')) // free
 
 
 module.exports = {
