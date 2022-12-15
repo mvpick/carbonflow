@@ -41,7 +41,7 @@ html{
 	}
 
 	::-webkit-scrollbar-thumb{
-    background: $main_color;
+    background: $color_main;
     border-radius: 5px;
     margin-right: 4px;
     height: 10%;
@@ -100,10 +100,10 @@ input:focus,select {
 		}
 		button{
 			// margin-right: 12px;
-			color: #616161;
+			color: #D1D2D7;
 			font-weight: bold;
 			padding: 8px 12px;
-			border-bottom: 2px solid #e4e4e4;
+			border-bottom: 2px solid #DFE0E1;
 			width: 100%;
 			
 			&:nth-child(2){
@@ -770,13 +770,35 @@ button.x_btn{
 	}
  }
 
+ .mini_mainBtn1{
+	width: 76px;
+	padding: 6px 0;
+	background-color:$main_color;
+	color: #fff;
+	font-size: 14px;
+	border-radius:$border_radius;
+	font-weight: 500;
+	text-align: center;
+	@include desktop{
+		font-size: 16px;
+	}
+   }
+
+   .tab_btn{
+		padding: 8px 16px;
+		background-color: #F4F4F6;
+		color: #5B6071;
+		border-radius: 4px;
+
+   }
+
 
 .subBtn1{
-	color: #022064;
+	color: $main_color;
 	width: 100%;
 	padding: 14px 0;
 	background-color: #fff;
-	border: 1px solid #022064;
+	border: 1px solid $main_color;
 	border-radius: 5px;
 }
 

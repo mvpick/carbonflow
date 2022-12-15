@@ -4,9 +4,9 @@
         <section class="tab_section">
             <div class="flex_box">
                 <button @click="on_tab=0"
-                :class="{ 'on_tab' : on_tab === 0 }">산업별 탄소배출량</button>
+                :class="{ 'on_tab' : on_tab === 0 }">부문별 탄소 배출량</button>
                 <button @click="on_tab=1"
-                :class="{ 'on_tab' : on_tab === 1 }">연도별 탄소배출량</button>
+                :class="{ 'on_tab' : on_tab === 1 }">연도별 탄소 배출량</button>
             </div>
         </section>
 

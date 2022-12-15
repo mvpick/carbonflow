@@ -16,22 +16,30 @@
         </div> -->
 
         <div class="table_box">
-            <div class="content">
+            <div class="content" v-for="(item, index) in content" :key="index">
                 <div class="no">
-                    <span>01</span>
-                    <p>현대제철</p>
+                    <span v-if="nomal">{{item.No}}</span>
+                    <p>{{item.name}}</p>
                 </div>
+                <p v-if="individual">
+                    {{item.address}}
+                </p>
                 <div class="info">
                     <dl>
                         <dt>배출량</dt>
-                        <dd>189</dd>
+                        <dd>{{item.emission}}</dd>
                     </dl>
                     <dl>
                         <dt>업종</dt>
-                        <dd>철강업</dd>
+                        <dd>{{item.industry}}</dd>
+                    </dl>
+                    <dl v-if="individual">
+                        <dt>적용기준</dt>
+                        <dd>{{item.standard}}</dd>
                     </dl>
                 </div>
             </div>
+            
         </div>
 
     </div>
@@ -41,26 +49,36 @@
 export default{
 data() {
     return{
-        row:[
+        content:[
             {
-                No:'1',
+                No:'01',
                 name:'현대제철',
+                address:'부산광역시 강서구 71-12',
                 emission:'88',
                 industry:'제철업',
+                standard:'사업장/업체',
             },
             {
-                No:'2',
+                No:'02',
                 name:'포스코',
+                address:'부산광역시 강서구 71-12',
                 emission:'76',
                 industry:'제철업',
+                standard:'사업장/업체',
             },
             {
-                No:'3',
+                No:'03',
                 name:'현대제철',
+                address:'부산광역시 강서구 71-12',
                 emission:'60',
-                industry:'제철업',
+                industry:'건설',
+                standard:'사업장/업체',
             },
-        ]
+        ],
+        // nomal: 일반현황 테이블에서만 노출되는 내용
+        nomal:false,
+        // individual: 개별기업배출량 테이블에서만 노출되는 내용
+        individual: true,
     }
   }
 }
@@ -68,6 +86,51 @@ data() {
 
 <style lang="scss" scoped>
 #Table{
+    .table_box{
+        .content{
+            padding: 12px 0;
+            border-bottom: 1px solid #F4F4F6;
+            .no{
+                display: flex;
+                span{
+                    color: #0064FF;
+                    font-weight: bold;
+                    margin-right: 8px;
+                }
+                P{
+                    color: #3D414F;
+                    font-weight: 500;
+                }
+            }
+            >p{
+                font-size: 14px;
+                color: #5B6071;
+                padding-top: 8px;
+            }
+            .info{
+                display: flex;
+                dl{
+                    display: flex;
+                    margin-top: 8px;
+                    margin-right: 8px;
+
+                    dt{
+                        margin-right: 4px;
+                        color: #969AA6;
+                        font-size: 14px;
+                    }
+                    dd{
+                        font-size: 14px;
+                        color: #3D414F;
+                    }
+                    &:last-child{
+                        margin-right: 0px;
+                        
+                    }
+                }
+            }
+        }
+    }
     
     // .table_box{
     //     ul{
@@ -120,42 +183,5 @@ data() {
             
     //     }
     // }
-    .table_box{
-        .content{
-            padding: 12px 0;
-            border-bottom: 1px solid #F4F4F6;
-            .no{
-                display: flex;
-                span{
-                    color: #0064FF;
-                    font-weight: bold;
-                    margin-right: 8px;
-                }
-                P{
-                    color: #3D414F;
-                    font-weight: 500;
-                }
-            }
-            .info{
-                display: flex;
-                dl{
-                    display: flex;
-                    margin-top: 8px;
-                    dt{
-                        margin-right: 4px;
-                        color: #969AA6;
-                        font-size: 14px;
-                    }
-                    dd{
-                        font-size: 14px;
-                    }
-                    &:first-child{
-                        margin-right: 8px;
-                        
-                    }
-                }
-            }
-        }
-    }
 }
 </style>
