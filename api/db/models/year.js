@@ -15,6 +15,24 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'year',
     })
+    year.associate = function(models){
+      year.hasMany(models.industryEmissions, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+      year.hasMany(models.regionEmissions, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+      year.hasMany(models.yearEmissions, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+      year.hasMany(models.enterpriseEmissions, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+    }
     return year
 }
 

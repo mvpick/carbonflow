@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             allowNull: false
         },
-        yearId : {
+        year_id : {
             type: DataTypes.INTEGER,
             allowNull: false,
             comment: '연도'
@@ -20,5 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'yearEmissions',
     })
+    yearEmissions.associate = function(models){
+      yearEmissions.belongsTo(models.year, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+    }
     return yearEmissions
 }
