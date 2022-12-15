@@ -33,19 +33,21 @@ export const uploadYearIndustryEmissions = async(req, res) => {
     truncate: true
   })
 
-   for await(let item of Object.entries(yearData)) {
-    const findId = await Year.findOne({
-      attributes: ['id'],
-      where: {
-        name: item[0]
-      }
-    });
+  await Promise.all(
+    Object.entries(yearData).map(async item => {
+      const findId = await Year.findOne({
+        attributes: ['id'],
+        where: {
+          name: item[0]
+        }
+      })
 
-    await YearEmissions.create({
-      year_id: findId.id,
-      value: item[1]
+      await YearEmissions.create({
+        year_id: findId.id,
+        value: item[1]
+      })
     })
-   }
+  );
 
 
 // 산업별 배출량
@@ -71,24 +73,25 @@ export const uploadYearIndustryEmissions = async(req, res) => {
       }
     }
 
-    for await(let item of industryArray) {
-      const findId = await Year.findOne({
-        attributes: ['id'],
-        where: {
-          name: item.year
-        }
-      });
+    await Promise.all(
+      industryArray.map(async item => {
+        const findId = await Year.findOne({
+          attributes: ['id'],
+          where: {
+            name: item.year
+          }
+        })
 
-      await IndustryEmissions.create({
-        year_id: findId.id,
-        energy: item.energy,
-        process: item.process,
-        agriculture: item.agriculture,
-        lulucf: item.lulucf,
-        waste: item.waste
-      });
-    }
-
+        await IndustryEmissions.create({
+          year_id: findId.id,
+          energy: item.energy,
+          process: item.process,
+          agriculture: item.agriculture,
+          lulucf: item.lulucf,
+          waste: item.waste
+        })
+      })
+    );
 
     return res.status(200).send({
       message: 'success'
@@ -127,21 +130,62 @@ export const uploadRegionEmissions = async (req, res) => {
         }
       })
 
-      for await(let innerItem of result[i]){
-        const findRegion = await Region.findOne({
-          attributes: ['id'],
-          where: {
-            name: innerItem['시도']
-          }
-        });
+      await Promise.all(
+        result[i].map(async innerItem => {
+          const findRegion = await Region.findOne({
+            attributes: ['id'],
+            where: {
+              name: innerItem['시도']
+            }
+          });
 
-        await RegionEmissions.create({
-          year_id: findYear.id,
-          region_id: findRegion.id,
-          value: innerItem['배출량']
-        });
+          await RegionEmissions.create({
+            year_id: findYear.id,
+            region_id: findRegion.id,
+            value: innerItem['배출량']
+          });
+        })
+      );
+    }
+
+    return res.status(200).send({
+      message: 'success'
+    })
+  } catch(err) {
+    console.error(err);
+    return res.status(400).send({
+      message: 'fail'
+    })
+  }
+}
+
+// ------------------------------------------- 참여기업 배출량 ---------------------------------------
+export const uploadEnterpriseEmissions = async(req, res) => {
+  try {
+    const file = req.file;
+
+    fs.readdir( "static/files", function( error, filelist ) {
+      for(let i = 0; i < filelist.length - 1; i++) {
+        fs.unlinkSync(`static/files/${ filelist[i] }`);
+      }
+    });
+
+    const excelFile = xlsx.readFile(file.path);
+    const sheetNames = excelFile.SheetNames;
+    const sheets = sheetNames.map(item => excelFile.Sheets[item]);
+    const result = sheets.map(item => excelFilter(item));
+
+    for(let item of result[0]) {
+      for(let j = 0; j < result[1].length; j++) {
+        if(item['업체명'] === result[1][j]['업체명']) {
+          result[1][j]['소재지'] = item['소재지']
+        } else {
+          result[1][j]['소재지'] = null
+        }
       }
     }
+
+    console.log(result[1])
 
     return res.status(200).send({
       message: 'success'

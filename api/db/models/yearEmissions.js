@@ -20,5 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'yearEmissions',
     })
+    yearEmissions.associate = function(models){
+      yearEmissions.belongsTo(models.year, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+    }
     return yearEmissions
 }

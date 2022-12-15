@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-    const regionEmissions = sequelize.define('regionEmissions', {
+    const enterpriseEmissions = sequelize.define('enterpriseEmissions', {
         id : {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -12,28 +12,24 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             comment: '연도'
         },
-        region_id : {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            comment: '지역'
-        },
         value: {
           type: DataTypes.STRING,
           allowNull: false,
           comment: '배출량'
+        },
+        address: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          comment: '소재지'
         }
     }, {
         tableName: 'regionEmissions',
     })
-    regionEmissions.associate = function(models){
-      regionEmissions.belongsTo(models.region, {
-        foreignKey: 'region_id',
-        onDelete: 'CASCADE',
-      });
-      regionEmissions.belongsTo(models.year, {
+    enterpriseEmissions.associate = function(models){
+      enterpriseEmissions.belongsTo(models.year, {
         foreignKey: 'year_id',
         onDelete: 'CASCADE',
       });
     }
-    return regionEmissions
+    return enterpriseEmissions
 }

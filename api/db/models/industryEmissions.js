@@ -40,5 +40,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'industryEmissions',
     })
+    industryEmissions.associate = function(models){
+      industryEmissions.belongsTo(models.year, {
+        foreignKey: 'year_id',
+        onDelete: 'CASCADE',
+      });
+    }
     return industryEmissions
 }

@@ -8,6 +8,10 @@
       <div class="uploadItemTitle">지역별 배출량</div>
       <input type="file" @change="uploadFile" /> <button @click="upload('uploadRegionEmissions')">업로드</button>
     </div>
+    <div class="uploadItem">
+      <div class="uploadItemTitle">참여기업 배출량</div>
+      <input type="file" @change="uploadFile" /> <button @click="upload('uploadEnterpriseEmissions')">업로드</button>
+    </div>
 
     <div class="loadingWrapper" v-if="!!loadingState">
       <div class="loadingSpinner">
