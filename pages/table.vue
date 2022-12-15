@@ -51,13 +51,11 @@ data() {
 
 <style lang="scss" scoped>
 #table{
+ 	padding-bottom: 100px;
+
     .tab_section{
         margin-bottom: 20px;
     }
-    .top_box{
-
-    }
-
     p{
         margin: 32px 0 16px;
         color: #5B6071;

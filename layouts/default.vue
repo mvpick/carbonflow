@@ -32,7 +32,7 @@ export default {
 
 <style lang="scss" scoped>
 .menu{
-    padding: 10px 16px;
+    padding: 10px 24px;
     width: 100%;
     display: flex;
     justify-content: space-between;

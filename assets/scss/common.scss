@@ -467,6 +467,7 @@ img{
 		padding: 16px;
 		background: url('~/assets/img/icon/arrow_drop_down.png') no-repeat center right 12px /24px 24px;
 		border: 1px solid #D9DADE;
+		background-color: #fff;
 		// color: #81868A;
 		@include desktop{
 			font-size: 16px;
@@ -732,6 +733,7 @@ button.x_btn{
  padding: 10px 4px;
  width: 100%;
  background-color: $color_main;
+ border: 1px solid $color_main;
  color: #fff;
  border-radius: 30px;
  text-align: center;

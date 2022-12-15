@@ -6,125 +6,77 @@
         <!-- 지도 -->
         <div id="map"></div>
 
-        <!-- 모바일메뉴 -->
-        <div class="mobile_menubox">
-            <button class="menu" @click="button_box=true">
-                <img src="~assets/img/icon/menu.png" alt="">
-                
-            </button>
-
-            <div class="button_box" v-if="button_box">
-                <button class="x_btn" @click="button_box=false"></button>
-                <div class="input">
-                    <select name="" id="">
-                        <option value="">2022년</option>
-                        <option value="">2021년</option>
-                        <option value="">2020년</option>
-                        <option value="">2019년</option>
-                        <option value="">2018년</option>
-                        <option value="">2017년</option>
-                        <option value="">2016년</option>
-                        <option value="">2015년</option>
-                        <option value="">2014년</option>
-                        <option value="">2013년</option>
-                        <option value="">2012년</option>
-                    </select>
-                </div>
-                <div class="button">
-                    <button class="mainBtn2">지역배출량</button>
-                    <button class="mainBtn2">증감량</button>
-                    <button class="mainBtn2">참여기업수</button>
-                    <button class="mainBtn1">국제배출량 순위</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- PC메뉴 -->
-        <div class="pc_menubox">
-            <div class="option_box">
-                <div class="button_box">
-                    <div class="input">
-                        <select name="" id="">
-                            <option value="">2022년</option>
-                            <option value="">2021년</option>
-                            <option value="">2020년</option>
-                            <option value="">2019년</option>
-                            <option value="">2018년</option>
-                            <option value="">2017년</option>
-                            <option value="">2016년</option>
-                            <option value="">2015년</option>
-                            <option value="">2014년</option>
-                            <option value="">2013년</option>
-                            <option value="">2012년</option>
-                        </select>
-                    </div>
-                    <div class="button">
-                        <button class="mainBtn2" @click="onRegionEmission()">지역배출량</button>
-                        <button class="mainBtn2" @click="onRegionVariation()">증감량</button>
-                        <button class="mainBtn2" @click="onCompanyNumber()">참여기업수</button>
-                        <button class="mainBtn1">국제배출량 순위</button>
-                    </div>
-                </div>
-                <div class="button_box">
-                    <button class="mainBtn1" @click="chart_modal=true">
-                        <img src="~assets/img/icon/pc_chart2.png" alt="">
+        <div class="menu_box">
+            <div class="button_box">
+                <div class="button" @click="select_year=!select_year==true">
+                    <button class="mainBtn2" @click="on_click1=!on_click1==true"
+                    v-if="on_click1==true">
+                        <img src="~assets/img/icon/index_btn1.png" alt="">
+                        <p>지역배출량</p>
                     </button>
-                    <button class="mainBtn1" @click="table_modal=true">
-                        <img src="~assets/img/icon/pc_table.png" alt="">
+                    <button class="mainBtn1" @click="on_click1=!on_click1==true"
+                    v-if="on_click1==false">
+                        <img src="~assets/img/icon/index_btn1w.png" alt="">
+                        <p>지역배출량</p>
+                    </button>
+                </div>
+
+                <button class="mainBtn2" @click="on_click2=!on_click2==true"
+                    v-if="on_click2==true">
+                    <img src="~assets/img/icon/index_btn2.png" alt="">
+                    <p>증감량</p>
+                </button>
+                <button class="mainBtn1" @click="on_click2=!on_click2==true"
+                    v-if="on_click2==false">
+                    <img src="~assets/img/icon/index_btn2.png" alt="">
+                    <p>증감량</p>
+                </button>
+
+                <button class="mainBtn2" @click="on_click3=!on_click3==true"
+                    v-if="on_click3==true">
+                    <img src="~assets/img/icon/index_btn3.png" alt="">
+                    <p>참여기업 수</p>
+                </button>
+                <button class="mainBtn1" @click="on_click3=!on_click3==true"
+                    v-if="on_click3==false">
+                    <img src="~assets/img/icon/index_btn3w.png" alt="">
+                    <p>참여기업 수</p>
+                </button>
+
+                <div class="button" @click="rank_chart=!rank_chart==true">
+                    <button class="mainBtn2" @click="on_click4=!on_click4==true"
+                    v-if="on_click4==true">
+                        <img src="~assets/img/icon/index_btn4.png" alt="">
+                        <p>국제 배출량 순위</p>
+                    </button>
+                    <button class="mainBtn1" @click="on_click4=!on_click4==true"
+                    v-if="on_click4==false">
+                        <img src="~assets/img/icon/index_btn4w.png" alt="">
+                        <p>국제 배출량 순위</p>
                     </button>
                 </div>
             </div>
+            
+            <div class="input" v-if="select_year">
+                <select name="" id="">
+                    <option value="">기준연도를 선택하세요.</option>
+                    <option value="">2022년</option>
+                    <option value="">2021년</option>
+                    <option value="">2020년</option>
+                    <option value="">2019년</option>
+                    <option value="">2018년</option>
+                    <option value="">2017년</option>
+                    <option value="">2016년</option>
+                    <option value="">2015년</option>
+                    <option value="">2014년</option>
+                    <option value="">2013년</option>
+                    <option value="">2012년</option>
+                </select>
+            </div>
+
+            <div class="rank_chart" v-if="rank_chart"></div>
         </div>
 
-        <v-dialog v-model="chart_modal" max-width="600px">
-            <div class="chart_modal_box">
-                <section class="tab_section">
-                    <div class="flex_box">
-                        <button @click="on_tab=0" 
-                        :class="{ 'on_tab' : on_tab === 0 }">산업별 탄소배출량</button>
-                        <button @click="on_tab=1"
-                        :class="{ 'on_tab' : on_tab === 1 }">연도별 탄소배출량</button>
-                    </div>
-                </section>
-
-                <div class="industry" v-if="on_tab==0">
-
-                </div>
-
-                <div class="year" v-if="on_tab==1">
-                    
-                </div>
-
-                <button class="mainBtn1" @click="chart_modal=false">닫기</button>
-            </div>
-        </v-dialog>
-
-        <v-dialog v-model="table_modal" max-width="600px">
-            <div class="table_modal_box">
-                <section class="tab_section">
-                    <div class="flex_box">
-                        <button @click="on_tab=0" 
-                        :class="{ 'on_tab' : on_tab === 0 }">목표 관리제</button>
-                        <button @click="on_tab=1"
-                        :class="{ 'on_tab' : on_tab === 1 }">배출권 거래제</button>
-                    </div>
-                </section>
-
-                <div class="input">
-                    <input type="text" class="search" placeholder="업체명을 입력해 주세요">
-                </div>
-
-                <div class="target" v-if="on_tab==0">
-                    <Table/>
-                </div>
-                <div class="carbon_trading" v-if="on_tab==1">
-                    <Table/>
-                </div>
-                <button class="mainBtn1" @click="table_modal=false">닫기</button>
-            </div>
-        </v-dialog>
-
-        
     </div>
 </div>
 
@@ -135,10 +87,12 @@ import sido from '~/json/sido.json' // 지역 위경도
 export default {
     data() {
         return {
-            button_box: false,
-            chart_modal: true,
-            table_modal: true,
-            on_tab:0,
+            select_year: false,
+            rank_chart: false,
+            on_click1:true,
+            on_click2:true,
+            on_click3:true,
+            on_click4:true,
 
             map: null,
             polygons: [],
@@ -381,9 +335,7 @@ export default {
 
 <style lang="scss" scoped>
 #index{
-
     .map-wrapper {
-        border: 1px solid red;
         height: calc(100vh - 64px);
         width: 100vw;
         position: relative;
@@ -393,16 +345,14 @@ export default {
             width: 100vw;
         }
 
-        .mobile_menubox{
+        .menu_box{
             position: absolute;
             top: 0;
             z-index: 1000;
             width: 100%;
-
-            display: block;
-            
+            padding-left: 16px;
             @include desktop{
-                display: none;
+                max-width: 600px;
             }
             button.menu{
                 padding: 8px;
@@ -413,98 +363,142 @@ export default {
                 margin-right: 16px;
                 border-radius: 100%;
                 box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
-                @include desktop{
-                    display: none;
-                }
+                
+            }
+            .input{
+                margin: 12px 16px 0 0;
             }
             .button_box{
-                background-color: #fff;
-                padding: 16px;
-                position: fixed;
-                width: 100%;
-                top: 60px;
-                box-shadow: 0px 4px 16px rgb(0 0 0 / 10%);
-                .x_btn{
-                    margin-left: auto;
-                }
-                .input{
-                    margin: 12px 0;
-                }
-                .button{
-                    display: flex;
-                    // flex-wrap: wrap;
-                    button{
-                        margin-right: 4px;
-                        margin-bottom: 8px;
-                    }
-                    .mainBtn2{
-                        max-width: 300px;
-                    }
-                }
-            }
-        }
-        .pc_menubox{
-            position: absolute;
-            top: 0;
-            z-index: 1000;
-            width: 100%;
-
-            display: none;
-            @include desktop{
-                display: block;
-            }
-            .option_box{
                 display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                width: 100%;
-                margin: 0 auto;
-                padding: 20px 16px;
-                .button_box{
-                    display: flex;
-                    align-items: center;
-                    width: 65%;
-                    .input{
-                        margin-bottom: 0;
-                        margin-right: 10px;
-                        width: 17%;
+                margin: 12px 0;
+                overflow-x: scroll;
+                // flex-wrap: wrap;
+                .button{
+                    width: 100%;
+                    margin-right: 4px;
+                    @include desktop{
+                        margin-right: 8px;
                     }
-                    .button{
+                    button{
                         display: flex;
-                        width: 80%;
-                        button{
-                            margin-right: 10px;
+                        justify-content:center;
+                        margin-right: 4px;
+                        padding: 8px 12px;
+                        img{
+                            margin-right: 4px;
                         }
+                        p{
+                            white-space: nowrap;
+                        }
+                        @include desktop{
+                            margin-right: 8px;
+                        }
+                        // &:last-child{
+                        //     color: #fff;
+                        // }
+
                     }
-                    &:nth-child(2){
-                        width: 35%;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-end;
-                        button{
-                            width: 100px;
-                            margin-bottom: 10px;
-                            &:last-child{
-                                margin-bottom: 0;
-                            }
+                    .mainBtn1{
+                        p{
+                            color: #fff;
                         }
                     }
                 }
+                button{
+                    display: flex;
+                    justify-content:center;
+                    margin-right: 4px;
+                    padding: 8px 12px;
+                    img{
+                        margin-right: 4px;
+                    }
+                    p{
+                        white-space: nowrap;
+                    }
+                    @include desktop{
+                        margin-right: 8px;
+                    }
+                }
+                .mainBtn1{
+                    p{
+                        color: #fff;
+                    }
+                }
+                
+            }
+            .rank_chart{
+                background-color: rgba(0, 0, 0, 0.3);
+                padding: 12px;
+                margin: 16px;
+                border-radius: 12px;
+                color: #fff;
+                @include desktop{
+                    padding: 16px;
+                }
             }
         }
+        // .pc_menubox{
+        //     position: absolute;
+        //     top: 0;
+        //     z-index: 1000;
+        //     width: 100%;
+
+        //     display: none;
+        //     @include desktop{
+        //         display: block;
+        //     }
+        //     .option_box{
+        //         display: flex;
+        //         justify-content: space-between;
+        //         align-items: flex-start;
+        //         width: 100%;
+        //         margin: 0 auto;
+        //         padding: 20px 16px;
+        //         .button_box{
+        //             display: flex;
+        //             align-items: center;
+        //             width: 65%;
+        //             .input{
+        //                 margin-bottom: 0;
+        //                 margin-right: 10px;
+        //                 width: 17%;
+        //             }
+        //             .button{
+        //                 display: flex;
+        //                 width: 80%;
+        //                 button{
+        //                     margin-right: 10px;
+        //                 }
+        //             }
+        //             &:nth-child(2){
+        //                 width: 35%;
+        //                 display: flex;
+        //                 flex-direction: column;
+        //                 align-items: flex-end;
+        //                 button{
+        //                     width: 100px;
+        //                     margin-bottom: 10px;
+        //                     &:last-child{
+        //                         margin-bottom: 0;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
 
-        .chart_modal_box{
-            background-color: #fff;
-            padding: 40px 16px;
-            .industry,
-            .year{
-                padding: 16px;
-                box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
-                border-radius: 4px;
-            }
+        // .chart_modal_box{
+        //     background-color: #fff;
+        //     padding: 40px 16px;
+        //     .industry,
+        //     .year{
+        //         padding: 16px;
+        //         box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+        //         border-radius: 4px;
+        //     }
 
-        }
+        // }
     }
     
 

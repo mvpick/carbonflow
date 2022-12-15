@@ -99,14 +99,13 @@ data() {
 
 <style lang="scss" scoped>
 #chart{
+ 	padding-bottom: 100px;
     .tab_section{
         margin-bottom: 40px;
     }
     .industry,
     .year{
         padding: 16px;
-        box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
     }
 }
 </style>
