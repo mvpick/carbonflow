@@ -12,6 +12,10 @@
       <div class="uploadItemTitle">참여기업 배출량</div>
       <input type="file" @change="uploadFile" /> <button @click="upload('uploadEnterpriseEmissions')">업로드</button>
     </div>
+    <div class="uploadItem">
+      <div class="uploadItemTitle">목표관리제 / 배출권거래제</div>
+      <input type="file" @change="uploadFile" /> <button @click="upload('uploadTargetTradeEmissions')">업로드</button>
+    </div>
 
     <div class="loadingWrapper" v-if="!!loadingState">
       <div class="loadingSpinner">
@@ -53,6 +57,7 @@
           this.file = null;
         }).catch(err => {
           console.log(err);
+          alert(err.response.data.message)
           this.file = null;
         }).finally(() => {
           this.loadingState = false;

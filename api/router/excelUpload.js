@@ -35,7 +35,6 @@ const file_upload = multer({
 router.post('/uploadYearIndustryEmissions', file_upload.single('file'), excelUpload.uploadYearIndustryEmissions);
 router.post('/uploadRegionEmissions', file_upload.single('file'), excelUpload.uploadRegionEmissions);
 router.post('/uploadEnterpriseEmissions', file_upload.single('file'), excelUpload.uploadEnterpriseEmissions);
-
-
+router.post('/uploadTargetTradeEmissions', file_upload.single('file'), excelUpload.uploadTargetTradeEmissions);
 
 module.exports = router

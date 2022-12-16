@@ -8,6 +8,9 @@ const YearEmissions = require('../db/models').yearEmissions;
 const IndustryEmissions = require('../db/models').industryEmissions;
 const RegionEmissions = require('../db/models').regionEmissions;
 const EnterpriseEmissions = require('../db/models').enterpriseEmissions;
+const TargetEmissions = require('../db/models').targetEmissions;
+const TradeEmissions = require('../db/models').tradeEmissions;
+
 const sequelize = require("../db/models").sequelize
 
 // ----------------------------------------------------------- 산업별 / 연도별 배출량 -----------------------------------------------------------
@@ -125,6 +128,10 @@ export const uploadRegionEmissions = async (req, res) => {
     const sheets = sheetNames.map(item => excelFile.Sheets[item]);
     const result = sheets.map(item => excelFilter(item));
 
+    await RegionEmissions.destroy({
+      truncate: true
+    })
+
     for(let i = 0; i < result.length; i++) {
       const year = sheetNames[i];
 
@@ -133,10 +140,6 @@ export const uploadRegionEmissions = async (req, res) => {
         where: {
           name: year
         }
-      })
-
-      await RegionEmissions.destroy({
-        truncate: true
       })
 
       await Promise.all(
@@ -189,8 +192,8 @@ export const uploadEnterpriseEmissions = async(req, res) => {
       addressFilter[item['업체명']] = item['소재지']
     }
 
-    for(let j = 0; j < result[1].length; j++) {
-      result[1][j]['소재지'] = addressFilter[result[1][j]['업체명']] || null;
+    for(let item of result[1]) {
+      item['소재지'] = addressFilter[item['업체명']] || null;
     }
 
     const enterpriseData = result[1];
@@ -229,7 +232,7 @@ export const uploadEnterpriseEmissions = async(req, res) => {
 
         await EnterpriseEmissions.create({
           year_id: findYear.id,
-          name: innerItem['업체명'],
+          companyName: innerItem['업체명'],
           value: innerItem['배출량'],
           address: innerItem['소재지']
         });
@@ -242,6 +245,114 @@ export const uploadEnterpriseEmissions = async(req, res) => {
     console.error(err);
     return res.status(400).send({
       message: 'fail'
+    })
+  }
+}
+
+export const uploadTargetTradeEmissions = async (req, res) => {
+  try {
+    const file = req.file;
+
+    fs.readdir( "static/files", function( error, filelist ) {
+      for(let i = 0; i < filelist.length - 1; i++) {
+        fs.unlinkSync(`static/files/${ filelist[i] }`);
+      }
+    });
+
+    const excelFile = xlsx.readFile(file.path);
+    const sheetNames = excelFile.SheetNames;
+    const sheets = sheetNames.map(item => excelFile.Sheets[item]);
+    const result = sheets.map(item => excelFilter(item));
+    const addressFilter = {};
+    const categoryFilter = [];
+    const finalResult = [];
+
+// 소재지 필터 생성
+    const addressData = await EnterpriseEmissions.findAll({
+      attributes: ['companyName', 'address']
+    });
+
+    if(!!addressData.length) {
+// 소재지 추가
+      for(let item of addressData) {
+        addressFilter[item.companyName] = item.address
+      }
+
+      for(let i = 0; i < result.length; i++) { // 소재지 추가 및 카테고리 필터 생성
+        categoryFilter[i] = {};
+        finalResult[i] = [];
+
+        for(let innerItem of result[i]){
+          innerItem['소재지'] = addressFilter[innerItem['기업이름']];
+          if(!categoryFilter[i][innerItem['업종']]) {
+            categoryFilter[i][innerItem['업종']] = [];
+            categoryFilter[i][innerItem['업종']].push(innerItem);
+          } else {
+            categoryFilter[i][innerItem['업종']].push(innerItem);
+          }
+        }
+      };
+
+      for(let i = 0; i < categoryFilter.length; i++) { // 배출량 정렬 및 순위 추가
+        for(let item in categoryFilter[i]) {
+          const sortedItems = categoryFilter[i][item].sort((a, b) => {
+            return b['배출량'] - a['배출량']
+          })
+          const sortResult = sortedItems.map((mapItem, index) => {
+            return {
+              ...mapItem,
+              ['배출순위']: index + 1
+            }
+          });
+
+          finalResult[i] = [...finalResult[i], ...sortResult];
+        }
+      }
+
+      await TargetEmissions.destroy({
+        truncate: true
+      })
+
+      for await(let item of finalResult[0]) {
+        console.log(item['기업이름'])
+        await TargetEmissions.create({
+          company_name: item['기업이름'],
+          value: item['배출량'],
+          category: item['업종'],
+          rank: item['배출순위'],
+          address: item['소재지'],
+          standard: item['적용기준']
+        });
+      }
+
+
+      await TradeEmissions.destroy({
+        truncate: true
+      })
+
+      for await(let item of finalResult[1]) {
+        console.log(item['기업이름'])
+        await TradeEmissions.create({
+          company_name: item['기업이름'],
+          value: item['배출량'],
+          category: item['업종'],
+          rank: item['배출순위'],
+          address: item['소재지'],
+          standard: item['적용기준']
+        });
+      }
+
+
+      return res.status(200).send({
+        message: 'success'
+      })
+    } else {
+      throw new Error('undefined data');
+    }
+  } catch(err) {
+    console.error(err);
+    return res.status(400).send({
+      message: err.massage === 'undefined data' ? '참여기업 데이터가 없습니다.' : 'fail'
     })
   }
 }
