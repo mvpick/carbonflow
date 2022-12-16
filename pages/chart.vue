@@ -69,7 +69,6 @@ export default{
     getDatas(){
       this.$axios.get('/allData/getAllData')
       .then(res => {
-        this.year_select = res.data.data.year;
         this.ticks_max = Math.round(res.data.data.year_info[0].value) ;
 
         // 부문별 탄소 배출량
@@ -77,7 +76,8 @@ export default{
           let [__] = res.data.data.year.filter(item=>{
             return one.year_id === item.id;
           })
-          one.year = __
+          one.year = __;
+          this.year_select.push(__);
           this.industry_info.push(one)
         }
 
@@ -94,24 +94,23 @@ export default{
           
         }
 
+        // 초기 연도 디폴트 setting..
+        // this.selected_year_id = this.year_select[0].id;
+
       }).catch(err => {
         console.log(err);
       })
     },
+
     show_table(type, index, data){
       this.on_tab = index;
       if(type==='pieChartData' && index === 0){
-        console.log('선택된 부문별 탄소 배출량 : ' , data);
         if(!!data){
-          this.pieChartData.datasets[0].data = [];  // 데이터 수치 리셋
-          this.pieChartData.datasets[0].data = [data[0].energy ,data[0].process , data[0].agriculture , data[0].lulucf, data[0].waste];
-        }
-        else{
           this.pieChartData = {
             labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
             datasets: [
               {
-                data: [100,200,-300,400, 500],
+                data: [data[0].energy ,data[0].process , data[0].agriculture , data[0].lulucf, data[0].waste],
                 backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
               }
             ]
@@ -127,12 +126,11 @@ export default{
               }
             }
           }
+
         }
       }
       
       if(type==='barChartOptions' && index === 1){
-        console.log('전체 연도별 탄소 배출량 : ' , data);
-
         if(!!data){
           let x_year = [];
           let y_data = [];
@@ -141,20 +139,12 @@ export default{
             y_data.push(one.year.value);
           };
 
-          this.barChartOptions.scales.yAxes[0].ticks.max = 0; // y축 최대값 수치 리셋
-          this.barChartData.labels = [];  // 데이터 기간 리셋
-          this.barChartData.datasets[0].data = [];  // 데이터 수치 리셋
-
-          this.barChartOptions.scales.yAxes[0].ticks.max = this.ticks_max;
-          this.barChartData.labels = x_year;
-          this.barChartData.datasets[0].data = y_data;
-        }else{
           this.barChartData = {
-            labels: ["2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11"], // x 축
+            labels: x_year, // x 축
             datasets: [
               {
                 label: "Visualizaciones",
-                data: [2, 1, 16, 3, 4, 5], // y축
+                data: y_data, // y축
                 backgroundColor: "rgba(20, 255, 0, 0.3)",
                 borderColor: "rgba(100, 255, 0, 1)",
                 borderWidth: 2,
@@ -184,9 +174,9 @@ export default{
                 {
                   ticks: {
                     beginAtZero: true,
-                    max: 7,
+                    max: this.ticks_max,
                     min: 0,
-                    stepSize: 1,
+                    stepSize: 10000,
                   },
                   gridLines: {
                     display: true,
@@ -195,8 +185,8 @@ export default{
               ],
             },
           };
+          
         }
-        
       }
     }
   }
