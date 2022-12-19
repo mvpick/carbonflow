@@ -1,7 +1,7 @@
 <template>
 <div id="chart">
     <div class="com_contain">
-        <select :disabled="on_tab === 1" name="" id="" v-model="selected_year_id" style="background-color:red">
+        <select class="select_year" :disabled="on_tab === 1" name="" id="" v-model="selected_year_id">
           <option :value="item.id" v-for="(item, index) in year_select" :key="index">
               {{item.name}}
           </option>
@@ -39,21 +39,24 @@ export default{
       barChartData : null,
       barChartOptions : null,
       ticks_max : null,
+      changed : false,
     }
   },
+  // 연도 순서대로 정렬
+  // 연도 클릭시 변하도록
   mounted(){
-    // this.on_tab = 0;
     this.getDatas(0);
-    // this.show_table('pieChartData', 0);
   },
   watch:{
     "selected_year_id"(){
       // 부문별 탄소 배출량
-      if(this.selected_year_id !== null){
+      if(this.selected_year_id !== this.year_select[0].id){
         this.industry_info = this.industry_info.filter(item=>{
           return this.selected_year_id === item.id;
         });
-        // this.show_table('pieChartData', 0, this.industry_info);
+        console.log(this.industry_info,'this.industry_info <<< 2')
+        
+        this.show_table('pieChartData', 0, this.industry_info);
       }
      
     },
@@ -93,23 +96,24 @@ export default{
           
         }
 
-        // 초기 연도 디폴트 setting..
-        this.selected_year_id = this.year_select[0].id;
-        this.industry_info = this.industry_info.filter(item=>{
-          return this.selected_year_id === item.year_id;
-        });
-        // console.log(this.industry_info,'this.industry_info 필터완 -> 디폴트')
+        if(!this.changed){
+          // 초기 연도 디폴트 setting..
+          this.selected_year_id = this.year_select[0].id;
+          this.industry_info = this.industry_info.filter(item=>{
+            return this.selected_year_id === item.year_id;
+          });
+          // console.log(this.industry_info,'this.industry_info 필터완 -> 디폴트')
 
-        this.on_tab = index;
+          this.on_tab = index;
 
-        this.pieChartData = {
-            labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
-            datasets: [
-              {
-                data: [this.industry_info[0].energy ,this.industry_info[0].process , this.industry_info[0].agriculture , this.industry_info[0].lulucf, this.industry_info[0].waste],
-                backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
-              }
-            ]
+          this.pieChartData = {
+              labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
+              datasets: [
+                {
+                  data: [this.industry_info[0].energy ,this.industry_info[0].process , this.industry_info[0].agriculture , this.industry_info[0].lulucf, this.industry_info[0].waste],
+                  backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
+                }
+              ]
           };
           this.pieChartOptions = {
             responsive: true,
@@ -122,6 +126,8 @@ export default{
               }
             }
           }
+        }
+        
         
 
       }).catch(err => {
@@ -130,6 +136,7 @@ export default{
     },
 
     show_table(type, index, data){
+      console.log('show_table <<')
       this.on_tab = index;
       if(type==='pieChartData' && index === 0){
         if(!!data){
@@ -222,6 +229,14 @@ export default{
 
 <style lang="scss" scoped>
 #chart{
+  .select_year{
+    border: 2px solid black;
+    text-align: center;
+    border-radius: 10px;
+    height: 50px;
+    width: 80px;
+    margin-bottom: 10px;
+  }
  	padding-bottom: 100px;
     .tab_section{
         margin-bottom: 40px;
