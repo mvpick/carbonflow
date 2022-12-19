@@ -12,6 +12,7 @@ export const getAllData = async(req, res) => {
             raw: true
         }); // 연도별
         const year = await Year.findAll({ attributes: ['id', 'name'], order: [['name', 'DESC']] }); // 조회 연도
+        // console.log(year,'year 체크')
 
 
         return res.status(200).send({ code: 200, message: '모든 차트 데이터 조회 성공', data : {industry_info, year_info, year} })

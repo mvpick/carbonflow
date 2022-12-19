@@ -54,10 +54,16 @@ export default{
         let changed_data = this.industry_info.filter(item=>{
           return this.selected_year_id === item.year_id;
         });
-        console.log(changed_data,'필터링된 연도')
         this.show_table('pieChartData', 0, changed_data);
       }
-     
+
+      // if(this.year_select[0].id === this.year_select[0].id){
+      //   let changed_data = this.industry_info.filter(item=>{
+      //     return this.year_select[0].id === item.year_id;
+      //   });
+      //   this.show_table('pieChartData', 0, changed_data);
+      // }
+
     },
     "on_tab"(){
       // 연도별 탄소 배출량
@@ -81,7 +87,6 @@ export default{
           this.year_select.push(__);
           this.industry_info.push(one)
         }
-
         // 연도별 탄소 배출량
         for(let one of res.data.data.year){
           let [__] = res.data.data.year_info.filter(item=>{
@@ -132,12 +137,10 @@ export default{
     },
 
     show_table(type, index, data){
-      this.on_tab = index;
+      this.on_tab = -1;
+
       if(type==='pieChartData' && index === 0){
         if(!!data){
-          // console.log(data,'<< data 필터링 되어서 들어온 데이터')
-          this.pieChartData.datasets[0].data = []; //  초기화
-
           this.pieChartData = {
             labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
             datasets: [
@@ -160,7 +163,7 @@ export default{
           }
 
           console.log(this.pieChartData,'this.pieChartData???')
-
+          
         }
       }
       
@@ -222,6 +225,10 @@ export default{
           
         }
       }
+
+      setTimeout(() => {
+        this.on_tab = index;
+      }, 100);
     }
   }
 }
