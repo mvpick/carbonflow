@@ -1,86 +1,49 @@
 <template>
     <div id="Table">
-        <!-- <div class="table_box">
-            <ul class="first_row">
-                <li>순위</li>
-                <li>업체명</li>
-                <li>배출량</li>
-                <li>업종</li>
-            </ul>
-            <ul class="row" v-for="(item, index) in row" :key="index">
-                <li>{{item.No}}</li>
-                <li>{{item.name}}</li>
-                <li>{{item.emission}}</li>
-                <li>{{item.industry}}</li>
-            </ul>
-        </div> -->
-
         <div class="table_box">
-            <div class="content" v-for="(item, index) in content" :key="index">
+            <div class="content" v-for="(item, index) in contents" :key="index">
                 <div class="no">
-                    <span v-if="nomal">{{item.No}}</span>
-                    <p>{{item.name}}</p>
+                    <span v-if="sub_tab === 0">{{item.id}}</span>
+                    <p>{{item.company_name}}</p>
                 </div>
-                <p v-if="individual">
+                <p v-if="sub_tab === 1">
                     {{item.address}}
                 </p>
                 <div class="info">
                     <dl>
                         <dt>배출량</dt>
-                        <dd>{{item.emission}}</dd>
+                        <dd>{{item.value}}</dd>
                     </dl>
                     <dl>
                         <dt>업종</dt>
-                        <dd>{{item.industry}}</dd>
+                        <dd>{{item.category}}</dd>
                     </dl>
-                    <dl v-if="individual">
+                    <dl v-if="sub_tab === 0">
+                        <dt>배출순위</dt>
+                        <dd>{{item.rank}}</dd>
+                    </dl>
+                    <dl v-if="sub_tab === 1">
                         <dt>적용기준</dt>
                         <dd>{{item.standard}}</dd>
                     </dl>
                 </div>
             </div>
-            
         </div>
 
     </div>
 </template>
 
-<script>    
+<script>
 export default{
+  props: {
+    sub_tab: Number,
+    contents: Array
+  },
 data() {
     return{
-        content:[
-            {
-                No:'01',
-                name:'현대제철',
-                address:'부산광역시 강서구 71-12',
-                emission:'88',
-                industry:'제철업',
-                standard:'사업장/업체',
-            },
-            {
-                No:'02',
-                name:'포스코',
-                address:'부산광역시 강서구 71-12',
-                emission:'76',
-                industry:'제철업',
-                standard:'사업장/업체',
-            },
-            {
-                No:'03',
-                name:'현대제철',
-                address:'부산광역시 강서구 71-12',
-                emission:'60',
-                industry:'건설',
-                standard:'사업장/업체',
-            },
-        ],
         // nomal: 일반현황 테이블에서만 노출되는 내용
-        nomal:false,
-        // individual: 개별기업배출량 테이블에서만 노출되는 내용
-        individual: true,
     }
-  }
+  },
 }
 </script>
 
@@ -125,13 +88,13 @@ data() {
                     }
                     &:last-child{
                         margin-right: 0px;
-                        
+
                     }
                 }
             }
         }
     }
-    
+
     // .table_box{
     //     ul{
     //         display: flex;
@@ -180,7 +143,7 @@ data() {
     //                 width: 40%;
     //             }
     //         }
-            
+
     //     }
     // }
 }

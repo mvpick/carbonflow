@@ -1,7 +1,6 @@
 import xlsx from 'xlsx';
 import fs from 'fs';
 import { excelFilter } from '../utils/excelFilter';
-import { NULL } from 'node-sass';
 const Year = require('../db/models').year;
 const Region = require('../db/models').region;
 const YearEmissions = require('../db/models').yearEmissions;
@@ -51,7 +50,7 @@ export const uploadYearIndustryEmissions = async(req, res) => {
 
           await YearEmissions.create({
             year_id: findId.id,
-            value: item[1]
+            value: item[1] || null
           }, { transaction: t })
         })
       );
@@ -147,14 +146,14 @@ export const uploadRegionEmissions = async (req, res) => {
           const findRegion = await Region.findOne({
             attributes: ['id'],
             where: {
-              name: innerItem['시도']
+              name: innerItem['시도'] || null
             }
           });
 
           await RegionEmissions.create({
             year_id: findYear.id,
             region_id: findRegion.id,
-            value: innerItem['배출량']
+            value: innerItem['배출량'] || null
           });
         })
       );
@@ -232,9 +231,9 @@ export const uploadEnterpriseEmissions = async(req, res) => {
 
         await EnterpriseEmissions.create({
           year_id: findYear.id,
-          companyName: innerItem['업체명'],
-          value: innerItem['배출량'],
-          address: innerItem['소재지']
+          companyName: innerItem['업체명'] || null,
+          value: innerItem['배출량'] || null,
+          address: innerItem['소재지'] || null
         });
       }
 
@@ -316,12 +315,12 @@ export const uploadTargetTradeEmissions = async (req, res) => {
       for await(let item of finalResult[0]) {
         console.log(item['기업이름'])
         await TargetEmissions.create({
-          company_name: item['기업이름'],
-          value: item['배출량'],
-          category: item['업종'],
-          rank: item['배출순위'],
-          address: item['소재지'],
-          standard: item['적용기준']
+          company_name: item['기업이름'] || null,
+          value: item['배출량'] || null,
+          category: item['업종'] || null,
+          rank: item['배출순위'] || null,
+          address: item['소재지'] || null,
+          standard: item['적용기준'] || null
         });
       }
 
@@ -333,12 +332,12 @@ export const uploadTargetTradeEmissions = async (req, res) => {
       for await(let item of finalResult[1]) {
         console.log(item['기업이름'])
         await TradeEmissions.create({
-          company_name: item['기업이름'],
-          value: item['배출량'],
-          category: item['업종'],
-          rank: item['배출순위'],
-          address: item['소재지'],
-          standard: item['적용기준']
+          company_name: item['기업이름'] || null,
+          value: item['배출량'] || null,
+          category: item['업종'] || null,
+          rank: item['배출순위'] || null,
+          address: item['소재지'] || null,
+          standard: item['적용기준'] || null
         });
       }
 
