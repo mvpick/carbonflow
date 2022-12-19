@@ -1,6 +1,8 @@
 const YearEmissions = require('../db/models').yearEmissions;
 const IndustryEmissions = require('../db/models').industryEmissions;
 const Year = require('../db/models').year;
+const RegionEmissions = require('../db/models').regionEmissions;
+const Region = require('../db/models').region;
 const sequelize = require("../db/models").sequelize;
 
 export const getAllData = async(req, res) => {
@@ -22,5 +24,67 @@ export const getAllData = async(req, res) => {
             code : 500,
             message: '모든 차트 데이터 조회 실패'
         });
+    }
+}
+
+// 지역배출량 연도
+export const getRegionEmissionYear = async(req, res) => {
+    try {
+        const find_year = await Year.findAll({
+            include: {
+                model: RegionEmissions
+            },
+            order: [['createdAt', 'DESC']],
+        })
+        console.log(find_year)
+        let years = []
+        find_year.map(item => {
+            if(item.regionEmissions.length > 0) {
+                years.push(item.name)
+            }
+        })        
+
+        return res.status(200).send({ code: 200, message: '지역배출량 연도 조회 성공', data: years })
+        
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '지역배출량 연도 조회 실패' });
+    }
+}
+
+
+// 지역 배출량 조회
+export const getRegionEmission = async(req, res) => {
+
+    const { year } = req.body
+    try {
+        const find_year = await Year.findOne({
+            where: { name: year },
+            include: {
+                model: RegionEmissions,
+                include: [{
+                    model: Year,
+                }, {
+                    model: Region,
+                }]
+            },
+            order: [['createdAt', 'DESC']],
+        })
+
+        console.log(find_year)
+
+        let data = []
+        find_year.regionEmissions.map(item => {
+            data.push({
+                name: item.region.name,
+                value: item.value
+            })
+        })
+
+        return res.status(200).send({ code: 200, message: '지역배출량 조회 성공', data: data })
+        
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '지역배출량 조회 실패' });
     }
 }
