@@ -7,5 +7,7 @@ router.get('/getRegionEmissionYear', allData.getRegionEmissionYear); // 지역�
 router.post('/getRegionEmission', allData.getRegionEmission); // 지역배출량
 router.get('/getRegionVariationYear', allData.getRegionVariationYear); // 증감량 조회
 router.post('/getRegionVariation', allData.getRegionVariation); // 증감량
+router.get('/getEnterpriseEmission', allData.getEnterpriseEmission); // 참여기업 조회
+router.post('/postLatLng', allData.postLatLng); // 위, 경도 저장
 
 module.exports = router

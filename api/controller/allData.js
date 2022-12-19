@@ -3,6 +3,7 @@ const IndustryEmissions = require('../db/models').industryEmissions;
 const Year = require('../db/models').year;
 const RegionEmissions = require('../db/models').regionEmissions;
 const Region = require('../db/models').region;
+const EnterpriseEmissions = require('../db/models').enterpriseEmissions;
 const sequelize = require("../db/models").sequelize;
 
 export const getAllData = async(req, res) => {
@@ -89,7 +90,7 @@ export const getRegionEmission = async(req, res) => {
 }
 
 
-// 증감량
+// 증감량 연도
 export const getRegionVariationYear = async(req, res) => {
     try {
         const find_year = await Year.findAll({
@@ -169,5 +170,45 @@ export const getRegionVariation = async(req, res) => {
     } catch (error) {
         console.log(error,'error')
         return res.status(500).send({ code : 500, message: '증감량 조회 실패' });
+    }
+}
+
+
+// 증감량
+export const getEnterpriseEmission = async(req, res) => {
+    try {
+        const findEnterpriseEmission = await EnterpriseEmissions.findAll({
+            include: {
+                model: Year
+            }
+        })
+        
+        return res.status(200).send({ code: 200, message: '증감량 연도 조회 성공', data: findEnterpriseEmission })
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '증감량 연도 조회 실패' })
+    }
+}
+
+
+
+
+// 위, 경도 주입
+export const postLatLng = async(req, res) => {
+    const { id, lat, lng } = req.body
+    try {
+        const findEnterpriseEmission = await EnterpriseEmissions.update({
+            lat, 
+            lng
+        }, {
+            where: { id, }
+        })
+
+        console.log(findEnterpriseEmission)
+        
+        return res.status(200).send({ code: 200, message: '위, 경도 주입 성공' })
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '위, 경도 주입 실패' })
     }
 }

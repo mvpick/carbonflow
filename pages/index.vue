@@ -27,13 +27,11 @@
                     <p>증감량</p>
                 </button>
 
-                <button class="mainBtn2" @click="on_click3=!on_click3==true"
-                    v-if="on_click3==true">
+                <button class="mainBtn2" @click="onCompanyNumber()" v-if="companyButtonStatus==false">
                     <img src="~assets/img/icon/index_btn3.png" alt="">
                     <p>참여기업 수</p>
                 </button>
-                <button class="mainBtn1" @click="on_click3=!on_click3==true"
-                    v-if="on_click3==false">
+                <button class="mainBtn1" @click="offCompanyNumber()" v-if="companyButtonStatus==true">
                     <img src="~assets/img/icon/index_btn3w.png" alt="">
                     <p>참여기업 수</p>
                 </button>
@@ -81,10 +79,12 @@ export default {
             on_click3:true,
             on_click4:true,
 
-            // 지역배출량, 증감량 버튼 상태
+            // 버튼 상태
             regionButtonStatus: false,
-            yearBarStatus: false,
             variationButtonStatus: false,
+            companyButtonStatus: false,
+            yearBarStatus: false,
+            
 
             // 지역배출량, 증감량 데이터
             years: [],
@@ -96,9 +96,9 @@ export default {
             map: null,
             polygons: [],
 
-            markers: [], // 마커 표현 데이터
+            markers: [], // 마커 데이터 집합
             markerStatus: 0, // 0: 빈화면, 1: 마커표시
-            infowindows: [],
+            infowindows: [], // 인포윈도 데이터 집합
 
             company: [
                 { name: '(유)에스케이씨에보닉페록사이드코리아', address: '울산광역시 남구 상개로 99(상개동)', value: 57349, year: 2021, },
@@ -113,7 +113,74 @@ export default {
         kakao.maps.load(this.initMap())
     },
     methods: {
+        async onCompanyNumber() {
+            this.companyButtonStatus = true
+            try {
+                const res = await this.$axios.get('/allData/getEnterpriseEmission')
+                console.log(res.data.data)
+                this.company = res.data.data
+                this.drawMarker()
+            } catch (err) {
+                console.log(err)
+            }
+        },
 
+        offCompanyNumber() {
+            this.companyButtonStatus = false
+            this.eraseMarker()
+        },
+
+        drawMarker() {
+            this.company.map(company => {
+
+                let position = new kakao.maps.LatLng(company.lat, company.lng)
+
+                let markerImageSrc = "images/markerCo2.png"
+                let imageSize = new kakao.maps.Size(18, 24)
+                let imageOptions = {}
+                let markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOptions)
+
+                let marker = new kakao.maps.Marker({ // 마커 객체
+                    position: position,
+                    image: markerImage,
+                    clickable: true
+                })
+                this.markers.push(marker)
+
+                let iwContent = `<div style="width: 200px; text-align:center; padding:6px; margin: 0 auto; font-size: 14px;">
+                                    <div>${company.companyName}</div>
+                                    <div>${company.value}tC / ${company.year.name}년</div>
+                                </div>`
+                // let iwRemoveable = true
+
+                let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우 객체
+                    content : iwContent,
+                    // removable : iwRemoveable
+                })
+                this.infowindows.push(infowindow)
+
+                // 마커에 클릭이벤트를 등록합니다
+                const _this = this
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(_this.map, marker)
+                })
+
+                marker.setMap(this.map)
+
+            })
+            
+        },
+
+        eraseMarker() {
+            this.markers.map(marker => { marker.setMap(null) })
+            this.markerStatus = 0
+            this.markers = []
+            this.infowindows.map(infowindow => { infowindow.close() })
+            this.infowindows = []
+        },
+
+
+        // 지역배출량, 증감량 데이터 초기화
         data_reset() {
             this.erasePolygon()
             this.regionEmissions = []
@@ -121,7 +188,6 @@ export default {
             this.years = []
             this.year=''
         },
-
         // 증감량 on
         async onRegionVariation() {
             this.data_reset()
@@ -136,7 +202,6 @@ export default {
                 console.log(err)
             }
         },
-
         // 증감량 off
         offRegionVariation() {
             this.variationButtonStatus = false
@@ -144,8 +209,8 @@ export default {
             this.data_reset()
         },
 
-         // 증감량 데이터 조회
-         async getRegionVariation() {
+        // 증감량 데이터 조회
+        async getRegionVariation() {
             try {
                 const res = await this.$axios.post('/allData/getRegionVariation', { year: this.year })
                 console.log(res.data.data)
@@ -169,7 +234,7 @@ export default {
                 console.log(err)
             }
         },
-        // 지역배출량 연도 선택
+        // 지역배출량 연도 선택시 폴리곤 draw
         async onChangeYear() {
             this.erasePolygon()
             try {
@@ -240,6 +305,24 @@ export default {
             this.polygons.map(polygon => { polygon.setMap(this.map) })
         },
 
+        
+
+        erasePolygon() {
+            this.polygons.map(polygon => { polygon.setMap(null) })
+            this.polygons = []
+        },
+
+
+        initMap() { // 맵 세팅
+            const container = document.getElementById("map") // DOM 레퍼런스
+            const options = {
+                center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
+                level: 12, // 확대, 축소
+            }
+            let map = new kakao.maps.Map(container, options) // 지도 생성
+            this.map = map
+        },
+
         getColorFromEmission(value) { // 색깔 생성기
             let emissions = []
             this.regionEmissions.map(region => { emissions.push(region.value) })
@@ -263,85 +346,6 @@ export default {
             }
         },
 
-        erasePolygon() {
-            this.polygons.map(polygon => { polygon.setMap(null) })
-            this.polygons = []
-        },
-
-
-        initMap() { // 맵 세팅
-            const container = document.getElementById("map") // DOM 레퍼런스
-            const options = {
-                center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
-                level: 12, // 확대, 축소
-            }
-            let map = new kakao.maps.Map(container, options) // 지도 생성
-            this.map = map
-        },
-
-        drawMarker() {
-            console.log('call on company')
-            let geocoder = new kakao.maps.services.Geocoder()
-            const _this = this
-
-            this.company.map(company => {
-                geocoder.addressSearch(company.address, function(result, status) {
-                    if (status === kakao.maps.services.Status.OK) { // 정상적으로 검색이 완료됐으면 
-
-
-                        let position = new kakao.maps.LatLng(result[0].y, result[0].x)
-
-                        let markerImageSrc = "images/markerCo2.png"
-                        let imageSize = new kakao.maps.Size(18, 24)
-                        let imageOptions = {}
-                        let markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOptions)
-
-                        let marker = new kakao.maps.Marker({
-                            position: position,
-                            image: markerImage
-                        })
-
-                        marker.setMap(_this.map)
-
-                        // let marker = new kakao.maps.Marker({ // 결과값으로 받은 위치를 마커로 표시합니다
-                        //     map: _this.map,
-                        //     position: coords
-                        // })
-                        let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우로 장소에 대한 설명을 표시합니다
-                            content: `
-                                <div style="width:150px;text-align:center;padding:6px 0;">
-                                    ${company.name}  / ${company.value} / ${company.year}
-                                </div>
-                            `
-                        })
-                        _this.infowindows.push(infowindow)
-                        infowindow.open(_this.map, marker)
-                        _this.markers.push(marker)
-                        _this.markerStatus = 1
-                    } 
-                })  
-            })
-            
-        },
-
-        eraseMarker() {
-            this.markers.map(marker => { marker.setMap(null) })
-            this.markerStatus = 0
-            this.markers = []
-
-            this.infowindows.map(infowindow => { infowindow.close() })
-            this.infowindows = []
-        },
-
-        onCompanyNumber() {
-            if(this.markerStatus === 0) {
-                this.drawMarker()
-            } else if(this.markerStatus === 1) {
-                this.eraseMarker()
-            }
-        },
-        
-
         getColorFromVariation(value) { // 색깔 생성기
             if (value) {
                 return '#FF5C00'
@@ -350,9 +354,6 @@ export default {
             }
         },
 
-       
-
-        
     }
 }
 </script>
