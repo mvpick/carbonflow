@@ -9,13 +9,11 @@
         <div class="menu_box">
             <div class="button_box">
                 <div class="button" @click="select_year=!select_year==true">
-                    <button class="mainBtn2" @click="on_click1=!on_click1==true"
-                    v-if="on_click1==true">
+                    <button class="mainBtn2" @click="onRegionEmission" v-if="regionButtonStatus===false">
                         <img src="~assets/img/icon/index_btn1.png" alt="">
                         <p>지역배출량</p>
                     </button>
-                    <button class="mainBtn1" @click="on_click1=!on_click1==true"
-                    v-if="on_click1==false">
+                    <button class="mainBtn1" @click="offRegionEmission" v-if="regionButtonStatus===true">
                         <img src="~assets/img/icon/index_btn1w.png" alt="">
                         <p>지역배출량</p>
                     </button>
@@ -58,19 +56,11 @@
             </div>
             
             <div class="input" v-if="select_year">
-                <select name="" id="">
+                <select name="" id="" v-model="regionEmissionYear" @change="onChangeRegionEmissionYear()"> 
                     <option value="">기준연도를 선택하세요.</option>
-                    <option value="">2022년</option>
-                    <option value="">2021년</option>
-                    <option value="">2020년</option>
-                    <option value="">2019년</option>
-                    <option value="">2018년</option>
-                    <option value="">2017년</option>
-                    <option value="">2016년</option>
-                    <option value="">2015년</option>
-                    <option value="">2014년</option>
-                    <option value="">2013년</option>
-                    <option value="">2012년</option>
+                    <option v-for="(item, index) in years" :key="index" :value="item">
+                        {{item}}년
+                    </option>
                 </select>
             </div>
 
@@ -94,6 +84,13 @@ export default {
             on_click3:true,
             on_click4:true,
 
+
+            regionButtonStatus: false,
+            years: [],
+            regionEmissionYear: '',
+            region: [],
+
+
             map: null,
             polygons: [],
             polygonStatus: 0, // 0: 빈화면, 1: 지역배출량, 2: 증감량
@@ -101,25 +98,7 @@ export default {
             markerStatus: 0, // 0: 빈화면, 1: 마커표시
             infowindows: [],
 
-            region: [
-                { name: '서울특별시', value: 12324706 },
-                { name: '부산광역시', value: 6787007 },
-                { name: '대구광역시', value: 3697602 },
-                { name: '인천광역시', value: 45126832 },
-                { name: '광주광역시', value: 1443049 },
-                { name: '대전광역시', value: 3867799 },
-                { name: '울산광역시', value: 47203695 },
-                { name: '세종특별자치시', value: 2245895 },
-                { name: '경기도', value: 62896149 },
-                { name: '강원도', value: 44206196 },
-                { name: '충청북도', value: 21256076 },
-                { name: '충청남도', value: 141911607 },
-                { name: '전라북도', value: 13578538 },
-                { name: '전라남도', value: 93199097 },
-                { name: '경상북도', value: 50697916 },
-                { name: '경상남도', value: 35581389 },
-                { name: '제주특별자치도', value: 1584366 },
-            ],
+   
 
             variation: [
                 { name: '서울특별시', value: true },
@@ -150,10 +129,128 @@ export default {
             
         }
     },
+    watch:{
+        // "regionEmissionYear"(){
+        //     this.erasePolygon()
+        //     this.getRegionEmission()
+        //     this.drawPolygon(1)
+        // },
+    },
     mounted() {
         kakao.maps.load(this.initMap())
     },
     methods: {
+        // 지역배출량 on
+        async onRegionEmission() {
+            this.regionButtonStatus = true
+            try {
+                const res = await this.$axios.get('/allData/getRegionEmissionYear')
+                console.log(res.data.data)
+                this.years = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
+
+        // 지역배출량 연도 선택
+        async onChangeRegionEmissionYear() {
+            this.erasePolygon()
+            await this.getRegionEmission()
+            this.drawPolygon(1)
+        },
+
+        // 지역배출량 데이터 조회
+        async getRegionEmission() {
+            try {
+                const res = await this.$axios.post('/allData/getRegionEmission', { year: this.regionEmissionYear })
+                console.log(res.data.data)
+                this.region = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
+
+        // 지역배출량 off
+        offRegionEmission() {
+            this.regionButtonStatus = false
+            this.erasePolygon()
+            this.years = []
+            this.region = []
+            this.regionEmissionYear=''
+        },
+
+        drawPolygon(type) { // type = 1 : 지역배출량, 2: 증감량
+            const sido_array = sido.features // 시도 데이터 배열 생성
+            let regionPolygonData = []
+            sido_array.map(item => {
+                let value 
+                if(type === 1) {
+                    value = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                } else if (type === 2) {
+                    value = this.variation.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                }
+                regionPolygonData.push({
+                    regionName: item.properties.CTP_KOR_NM,
+                    coordinates: item.geometry.coordinates,
+                    value,
+                })
+            })
+
+            regionPolygonData.map((region) => { // 폴리곤 생성 및 배열에 담기
+                region.coordinates.map((polygonCoordinates) => {
+                    let polygonPath = []
+                    polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
+                        const latLng = new kakao.maps.LatLng(coordinate[1], coordinate[0])
+                        polygonPath.push(latLng)
+                    })
+                    let polygon = new kakao.maps.Polygon({
+                        path:polygonPath, // 그려질 다각형의 좌표 배열입니다
+                        strokeWeight: 3, // 선의 두께입니다
+                        strokeColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 선의 색깔입니다
+                        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+                        strokeStyle: 'longdash', // 선의 스타일입니다
+                        fillColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 채우기 색깔입니다
+                        fillOpacity: 0.4 // 채우기 불투명도 입니다
+                    })
+                    this.polygons.push(polygon)
+                })
+            })
+
+            // 지도에 표시
+            this.polygons.map(polygon => { polygon.setMap(this.map) })
+            this.polygonStatus = type
+        },
+
+        getColorFromEmission(value) { // 색깔 생성기
+            let emissions = []
+            this.region.map(region => { emissions.push(region.value) })
+            const maxValue = Math.max.apply(null, emissions)
+            const unit = Math.ceil(maxValue / 4) 
+
+            const lv1_min = 0
+            const lv2_min = unit
+            const lv3_min = unit * 2
+            const lv4_min = unit * 3
+            const lv4_max = unit * 4
+
+            if (value >= lv1_min && value < lv2_min) {
+                return '#27D1BD'
+            } else if (value >= lv2_min && value < lv3_min) {
+                return '#FFD600'
+            } else if (value >= lv3_min && value < lv4_min) {
+                return '#FF9900'
+            } else if (value >= lv4_min && value < lv4_max) {
+                return '#FF4D00'
+            }
+            },
+
+        erasePolygon() {
+            this.polygons.map(polygon => { polygon.setMap(null) })
+            this.polygonStatus = 0
+            this.polygons = []
+        },
+
+     
 
         initMap() { // 맵 세팅
             const container = document.getElementById("map") // DOM 레퍼런스
@@ -227,16 +324,16 @@ export default {
             }
         },
 
-        onRegionEmission() {
-            if(this.polygonStatus === 0) {
-                this.drawPolygon(1)
-            } else if(this.polygonStatus === 1) {
-                this.erasePolygon()
-            } else if (this.polygonStatus === 2) {
-                this.erasePolygon()
-                this.drawPolygon(1)
-            }
-        },
+        // onRegionEmission() {
+        //     if(this.polygonStatus === 0) {
+        //         this.drawPolygon(1)
+        //     } else if(this.polygonStatus === 1) {
+        //         this.erasePolygon()
+        //     } else if (this.polygonStatus === 2) {
+        //         this.erasePolygon()
+        //         this.drawPolygon(1)
+        //     }
+        // },
         onRegionVariation() {
             if(this.polygonStatus === 0) {
                 this.drawPolygon(2)
@@ -248,71 +345,7 @@ export default {
             }
         },
 
-        drawPolygon(type) { // type = 1 : 지역배출량, 2: 증감량
-
-            const sido_array = sido.features // 시도 데이터 배열 생성
-            let regionPolygonData = []
-            sido_array.map(item => {
-                let value 
-                if(type === 1) {
-                    value = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
-                } else if (type === 2) {
-                    value = this.variation.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
-                }
-                regionPolygonData.push({
-                    regionName: item.properties.CTP_KOR_NM,
-                    coordinates: item.geometry.coordinates,
-                    value,
-                })
-            })
-
-            regionPolygonData.map((region) => { // 폴리곤 생성 및 배열에 담기
-                region.coordinates.map((polygonCoordinates) => {
-                    let polygonPath = []
-                    polygonCoordinates.map(coordinate => { // 덩어리 하나 만들기
-                        const latLng = new kakao.maps.LatLng(coordinate[1], coordinate[0])
-                        polygonPath.push(latLng)
-                    })
-                    let polygon = new kakao.maps.Polygon({
-                        path:polygonPath, // 그려질 다각형의 좌표 배열입니다
-                        strokeWeight: 3, // 선의 두께입니다
-                        strokeColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 선의 색깔입니다
-                        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-                        strokeStyle: 'longdash', // 선의 스타일입니다
-                        fillColor: type === 1 ? this.getColorFromEmission(region.value) : this.getColorFromVariation(region.value), // 채우기 색깔입니다
-                        fillOpacity: 0.4 // 채우기 불투명도 입니다
-                    })
-                    this.polygons.push(polygon)
-                })
-            })
-
-            // 지도에 표시
-            this.polygons.map(polygon => { polygon.setMap(this.map) })
-            this.polygonStatus = type
-        },
-
-        getColorFromEmission(value) { // 색깔 생성기
-            let emissions = []
-            this.region.map(region => { emissions.push(region.value) })
-            const maxValue = Math.max.apply(null, emissions)
-            const unit = Math.ceil(maxValue / 4) 
-
-            const lv1_min = 0
-            const lv2_min = unit
-            const lv3_min = unit * 2
-            const lv4_min = unit * 3
-            const lv4_max = unit * 4
-
-            if (value >= lv1_min && value < lv2_min) {
-                return '#27D1BD'
-            } else if (value >= lv2_min && value < lv3_min) {
-                return '#FFD600'
-            } else if (value >= lv3_min && value < lv4_min) {
-                return '#FF9900'
-            } else if (value >= lv4_min && value < lv4_max) {
-                return '#FF4D00'
-            }
-        },
+        
 
         getColorFromVariation(value) { // 색깔 생성기
             if (value) {
@@ -322,11 +355,7 @@ export default {
             }
         },
 
-        erasePolygon() {
-            this.polygons.map(polygon => { polygon.setMap(null) })
-            this.polygonStatus = 0
-            this.polygons = []
-        },
+       
 
         
     }
