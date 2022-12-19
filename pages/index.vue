@@ -8,24 +8,21 @@
 
         <div class="menu_box">
             <div class="button_box">
-                <div class="button" @click="select_year=!select_year==true">
-                    <button class="mainBtn2" @click="onRegionEmission" v-if="regionButtonStatus===false">
-                        <img src="~assets/img/icon/index_btn1.png" alt="">
-                        <p>지역배출량</p>
-                    </button>
-                    <button class="mainBtn1" @click="offRegionEmission" v-if="regionButtonStatus===true">
-                        <img src="~assets/img/icon/index_btn1w.png" alt="">
-                        <p>지역배출량</p>
-                    </button>
-                </div>
+                <button class="mainBtn2" @click="onRegionEmission" v-if="regionButtonStatus===false">
+                    <img src="~assets/img/icon/index_btn1.png" alt="">
+                    <p>지역배출량</p>
+                </button>
+                <button class="mainBtn1" @click="offRegionEmission" v-if="regionButtonStatus===true">
+                    <img src="~assets/img/icon/index_btn1w.png" alt="">
+                    <p>지역배출량</p>
+                </button>
 
-                <button class="mainBtn2" @click="on_click2=!on_click2==true"
-                    v-if="on_click2==true">
+
+                <button class="mainBtn2" @click="onRegionVariation" v-if="variationButtonStatus===false">
                     <img src="~assets/img/icon/index_btn2.png" alt="">
                     <p>증감량</p>
                 </button>
-                <button class="mainBtn1" @click="on_click2=!on_click2==true"
-                    v-if="on_click2==false">
+                <button class="mainBtn1" @click="offRegionVariation" v-if="variationButtonStatus===true">
                     <img src="~assets/img/icon/index_btn2.png" alt="">
                     <p>증감량</p>
                 </button>
@@ -55,8 +52,8 @@
                 </div>
             </div>
             
-            <div class="input" v-if="select_year">
-                <select name="" id="" v-model="regionEmissionYear" @change="onChangeRegionEmissionYear()"> 
+            <div class="input" v-if="yearBarStatus">
+                <select name="" id="" v-model="year" @change="onChangeYear()"> 
                     <option value="">기준연도를 선택하세요.</option>
                     <option v-for="(item, index) in years" :key="index" :value="item">
                         {{item}}년
@@ -84,41 +81,24 @@ export default {
             on_click3:true,
             on_click4:true,
 
-
+            // 지역배출량, 증감량 버튼 상태
             regionButtonStatus: false,
+            yearBarStatus: false,
+            variationButtonStatus: false,
+
+            // 지역배출량, 증감량 데이터
             years: [],
-            regionEmissionYear: '',
-            region: [],
+            year: '',
+            regionEmissions: [],
+            variation: [],
 
-
+            // 지도 데이터
             map: null,
             polygons: [],
-            polygonStatus: 0, // 0: 빈화면, 1: 지역배출량, 2: 증감량
+
             markers: [], // 마커 표현 데이터
             markerStatus: 0, // 0: 빈화면, 1: 마커표시
             infowindows: [],
-
-   
-
-            variation: [
-                { name: '서울특별시', value: true },
-                { name: '부산광역시', value: false },
-                { name: '대구광역시', value: true },
-                { name: '인천광역시', value: false },
-                { name: '광주광역시', value: true },
-                { name: '대전광역시', value: false },
-                { name: '울산광역시', value: true },
-                { name: '세종특별자치시', value: false },
-                { name: '경기도', value: true },
-                { name: '강원도', value: false },
-                { name: '충청북도', value: true },
-                { name: '충청남도', value: false },
-                { name: '전라북도', value: true },
-                { name: '전라남도', value: false },
-                { name: '경상북도', value: true },
-                { name: '경상남도', value: false },
-                { name: '제주특별자치도', value: true },
-            ],
 
             company: [
                 { name: '(유)에스케이씨에보닉페록사이드코리아', address: '울산광역시 남구 상개로 99(상개동)', value: 57349, year: 2021, },
@@ -129,20 +109,58 @@ export default {
             
         }
     },
-    watch:{
-        // "regionEmissionYear"(){
-        //     this.erasePolygon()
-        //     this.getRegionEmission()
-        //     this.drawPolygon(1)
-        // },
-    },
     mounted() {
         kakao.maps.load(this.initMap())
     },
     methods: {
+
+        data_reset() {
+            this.erasePolygon()
+            this.regionEmissions = []
+            this.variation = []
+            this.years = []
+            this.year=''
+        },
+
+        // 증감량 on
+        async onRegionVariation() {
+            this.data_reset()
+            this.variationButtonStatus = true
+            this.yearBarStatus = true
+            if(this.regionButtonStatus) { this.regionButtonStatus = false }
+            try {
+                const res = await this.$axios.get('/allData/getRegionVariationYear')
+                console.log(res.data.data)
+                this.years = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
+
+        // 증감량 off
+        offRegionVariation() {
+            this.variationButtonStatus = false
+            this.yearBarStatus = false
+            this.data_reset()
+        },
+
+         // 증감량 데이터 조회
+         async getRegionVariation() {
+            try {
+                const res = await this.$axios.post('/allData/getRegionVariation', { year: this.year })
+                console.log(res.data.data)
+                this.variation = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
+
         // 지역배출량 on
         async onRegionEmission() {
+            this.data_reset()
             this.regionButtonStatus = true
+            this.yearBarStatus = true
+            if(this.variationButtonStatus) { this.variationButtonStatus = false }
             try {
                 const res = await this.$axios.get('/allData/getRegionEmissionYear')
                 console.log(res.data.data)
@@ -151,41 +169,45 @@ export default {
                 console.log(err)
             }
         },
-
         // 지역배출량 연도 선택
-        async onChangeRegionEmissionYear() {
+        async onChangeYear() {
             this.erasePolygon()
-            await this.getRegionEmission()
-            this.drawPolygon(1)
-        },
-
-        // 지역배출량 데이터 조회
-        async getRegionEmission() {
             try {
-                const res = await this.$axios.post('/allData/getRegionEmission', { year: this.regionEmissionYear })
-                console.log(res.data.data)
-                this.region = res.data.data
+                if(this.regionButtonStatus) {
+                    await this.getRegionEmission()
+                    this.drawPolygon(1)
+                } else if(this.variationButtonStatus) {
+                    await this.getRegionVariation()
+                    this.drawPolygon(2)
+                }
             } catch (err) {
                 console.log(err)
             }
         },
-
+        // 지역배출량 데이터 조회
+        async getRegionEmission() {
+            try {
+                const res = await this.$axios.post('/allData/getRegionEmission', { year: this.year })
+                console.log(res.data.data)
+                this.regionEmissions = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
         // 지역배출량 off
         offRegionEmission() {
             this.regionButtonStatus = false
-            this.erasePolygon()
-            this.years = []
-            this.region = []
-            this.regionEmissionYear=''
+            this.yearBarStatus = false
+            this.data_reset()
         },
 
-        drawPolygon(type) { // type = 1 : 지역배출량, 2: 증감량
+        drawPolygon(type) { // type = 1 : 지역배출량 그리기, 2: 증감량 그리기
             const sido_array = sido.features // 시도 데이터 배열 생성
             let regionPolygonData = []
             sido_array.map(item => {
                 let value 
                 if(type === 1) {
-                    value = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                    value = this.regionEmissions.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
                 } else if (type === 2) {
                     value = this.variation.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
                 }
@@ -195,7 +217,6 @@ export default {
                     value,
                 })
             })
-
             regionPolygonData.map((region) => { // 폴리곤 생성 및 배열에 담기
                 region.coordinates.map((polygonCoordinates) => {
                     let polygonPath = []
@@ -215,15 +236,13 @@ export default {
                     this.polygons.push(polygon)
                 })
             })
-
             // 지도에 표시
             this.polygons.map(polygon => { polygon.setMap(this.map) })
-            this.polygonStatus = type
         },
 
         getColorFromEmission(value) { // 색깔 생성기
             let emissions = []
-            this.region.map(region => { emissions.push(region.value) })
+            this.regionEmissions.map(region => { emissions.push(region.value) })
             const maxValue = Math.max.apply(null, emissions)
             const unit = Math.ceil(maxValue / 4) 
 
@@ -242,15 +261,13 @@ export default {
             } else if (value >= lv4_min && value < lv4_max) {
                 return '#FF4D00'
             }
-            },
+        },
 
         erasePolygon() {
             this.polygons.map(polygon => { polygon.setMap(null) })
-            this.polygonStatus = 0
             this.polygons = []
         },
 
-     
 
         initMap() { // 맵 세팅
             const container = document.getElementById("map") // DOM 레퍼런스
@@ -323,28 +340,6 @@ export default {
                 this.eraseMarker()
             }
         },
-
-        // onRegionEmission() {
-        //     if(this.polygonStatus === 0) {
-        //         this.drawPolygon(1)
-        //     } else if(this.polygonStatus === 1) {
-        //         this.erasePolygon()
-        //     } else if (this.polygonStatus === 2) {
-        //         this.erasePolygon()
-        //         this.drawPolygon(1)
-        //     }
-        // },
-        onRegionVariation() {
-            if(this.polygonStatus === 0) {
-                this.drawPolygon(2)
-            } else if(this.polygonStatus === 1) {
-                this.erasePolygon()
-                this.drawPolygon(2)
-            } else if (this.polygonStatus === 2) {
-                this.erasePolygon()
-            }
-        },
-
         
 
         getColorFromVariation(value) { // 색깔 생성기
