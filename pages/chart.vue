@@ -36,7 +36,7 @@ export default{
           datasets: [
             {
               data: [100,200,-300,400,500],
-              backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
+              backgroundColor: ['#ED6E85', '#F2A254', '#F7CE6B', '#6CBDBF', '#56A1E5'],
             }
           ]
       },
@@ -128,15 +128,16 @@ export default{
       if(type==='pieChartData' && index === 0){
         this.on_tab = -1;
         if(!!data){
-          this.pieChartData = {
-            labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
-            datasets: [
-              {
-                data: [data[0].energy ,data[0].process , data[0].agriculture , data[0].lulucf, data[0].waste],
-                backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
-              }
-            ]
-          };          
+          this.pieChartData.datasets[0].data = [data[0].energy ,data[0].process , data[0].agriculture , data[0].lulucf, data[0].waste];
+          // this.pieChartData = {
+          //   labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
+          //   datasets: [
+          //     {
+          //       data: [data[0].energy ,data[0].process , data[0].agriculture , data[0].lulucf, data[0].waste],
+          //       backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
+          //     }
+          //   ]
+          // };          
         }
       }
       
