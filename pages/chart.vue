@@ -125,9 +125,8 @@ export default{
     },
 
     show_table(type, index, data){
-      this.on_tab = -1;
-
       if(type==='pieChartData' && index === 0){
+        this.on_tab = -1;
         if(!!data){
           this.pieChartData = {
             labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
