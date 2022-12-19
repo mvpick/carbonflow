@@ -3,6 +3,9 @@ const TargetEmissions = require('../db/models').targetEmissions;
 const TradeEmissions = require('../db/models').tradeEmissions;
 const IndustryEmissions = require('../db/models').industryEmissions;
 const Year = require('../db/models').year;
+const RegionEmissions = require('../db/models').regionEmissions;
+const Region = require('../db/models').region;
+const EnterpriseEmissions = require('../db/models').enterpriseEmissions;
 const sequelize = require("../db/models").sequelize;
 
 export const getAllData = async(req, res) => {
@@ -58,3 +61,186 @@ export const getTradeEmissions = async(req, res) => {
   }
 }
 
+// 지역배출량 연도
+export const getRegionEmissionYear = async(req, res) => {
+    try {
+        const find_year = await Year.findAll({
+            include: {
+                model: RegionEmissions
+            },
+            order: [['createdAt', 'DESC']],
+        })
+        console.log(find_year)
+        let years = []
+        find_year.map(item => {
+            if(item.regionEmissions.length > 0) {
+                years.push(item.name)
+            }
+        })
+
+        return res.status(200).send({ code: 200, message: '지역배출량 연도 조회 성공', data: years })
+
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '지역배출량 연도 조회 실패' });
+    }
+}
+
+
+// 지역 배출량 조회
+export const getRegionEmission = async(req, res) => {
+
+    const { year } = req.body
+    try {
+        const find_year = await Year.findOne({
+            where: { name: year },
+            include: {
+                model: RegionEmissions,
+                include: [{
+                    model: Year,
+                }, {
+                    model: Region,
+                }]
+            },
+            order: [['createdAt', 'DESC']],
+        })
+
+        let data = []
+        find_year.regionEmissions.map(item => {
+            data.push({
+                name: item.region.name,
+                value: item.value
+            })
+        })
+
+        return res.status(200).send({ code: 200, message: '지역배출량 조회 성공', data: data })
+
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '지역배출량 조회 실패' });
+    }
+}
+
+
+// 증감량 연도
+export const getRegionVariationYear = async(req, res) => {
+    try {
+        const find_year = await Year.findAll({
+            include: {
+                model: RegionEmissions
+            },
+            order: [['createdAt', 'DESC']],
+        })
+        console.log(find_year)
+        let years = []
+        find_year.map(item => {
+            if(item.regionEmissions.length > 0) {
+                years.push(item.name)
+            }
+        })
+        years.pop() // 증감량이므로 처음 연도 제거
+
+        return res.status(200).send({ code: 200, message: '증감량 연도 조회 성공', data: years })
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '증감량 연도 조회 실패' })
+    }
+}
+
+
+// 증감량
+export const getRegionVariation = async(req, res) => {
+
+    const { year } = req.body
+    try {
+        const find_year1 = await Year.findOne({
+            where: { name: year },
+            include: {
+                model: RegionEmissions,
+                include: [{
+                    model: Region,
+                }]
+            },
+            order: [
+                ['createdAt', 'DESC'],
+                [RegionEmissions, 'region_id', 'ASC'],
+            ],
+        })
+
+        console.log(find_year1)
+        const current_year_data = find_year1.regionEmissions
+
+        const find_year2 = await Year.findOne({
+            where: { name: year - 1},
+            include: {
+                model: RegionEmissions,
+                include: [{
+                    model: Year,
+                }, {
+                    model: Region,
+                }]
+            },
+            order: [
+                ['createdAt', 'DESC'],
+                [RegionEmissions, 'region_id', 'ASC'],
+            ],
+        })
+
+        console.log(find_year2)
+        const last_year_data = find_year2.regionEmissions
+
+        let data = []
+        for(let index = 0; index < current_year_data.length; index++) {
+            data.push({
+                name: current_year_data[index].region.name,
+                value: current_year_data[index].value - last_year_data[index].value >= 0 ? true : false
+            })
+        }
+
+        return res.status(200).send({ code: 200, message: '증감량 조회 성공', data })
+
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '증감량 조회 실패' });
+    }
+}
+
+
+// 증감량
+export const getEnterpriseEmission = async(req, res) => {
+    try {
+        const findEnterpriseEmission = await EnterpriseEmissions.findAll({
+            include: {
+                model: Year
+            }
+        })
+
+        return res.status(200).send({ code: 200, message: '증감량 연도 조회 성공', data: findEnterpriseEmission })
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '증감량 연도 조회 실패' })
+    }
+}
+
+
+
+
+// 위, 경도 주입
+export const postLatLng = async(req, res) => {
+    const { id, lat, lng } = req.body
+    try {
+        const findEnterpriseEmission = await EnterpriseEmissions.update({
+            lat,
+            lng
+        }, {
+            where: { id, }
+        })
+
+        console.log(findEnterpriseEmission)
+
+        return res.status(200).send({ code: 200, message: '위, 경도 주입 성공' })
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '위, 경도 주입 실패' })
+    }
+}

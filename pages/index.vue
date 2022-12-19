@@ -8,37 +8,30 @@
 
         <div class="menu_box">
             <div class="button_box">
-                <div class="button" @click="select_year=!select_year==true">
-                    <button class="mainBtn2" @click="on_click1=!on_click1==true"
-                    v-if="on_click1==true">
-                        <img src="~assets/img/icon/index_btn1.png" alt="">
-                        <p>지역배출량</p>
-                    </button>
-                    <button class="mainBtn1" @click="on_click1=!on_click1==true"
-                    v-if="on_click1==false">
-                        <img src="~assets/img/icon/index_btn1w.png" alt="">
-                        <p>지역배출량</p>
-                    </button>
-                </div>
+                <button class="mainBtn2" @click="onRegionEmission" v-if="regionButtonStatus===false">
+                    <img src="~assets/img/icon/index_btn1.png" alt="">
+                    <p>지역배출량</p>
+                </button>
+                <button class="mainBtn1" @click="offRegionEmission" v-if="regionButtonStatus===true">
+                    <img src="~assets/img/icon/index_btn1w.png" alt="">
+                    <p>지역배출량</p>
+                </button>
 
-                <button class="mainBtn2" @click="on_click2=!on_click2==true"
-                    v-if="on_click2==true">
+
+                <button class="mainBtn2" @click="onRegionVariation" v-if="variationButtonStatus===false">
                     <img src="~assets/img/icon/index_btn2.png" alt="">
                     <p>증감량</p>
                 </button>
-                <button class="mainBtn1" @click="on_click2=!on_click2==true"
-                    v-if="on_click2==false">
+                <button class="mainBtn1" @click="offRegionVariation" v-if="variationButtonStatus===true">
                     <img src="~assets/img/icon/index_btn2.png" alt="">
                     <p>증감량</p>
                 </button>
 
-                <button class="mainBtn2" @click="on_click3=!on_click3==true"
-                    v-if="on_click3==true">
+                <button class="mainBtn2" @click="onCompanyNumber()" v-if="companyButtonStatus==false">
                     <img src="~assets/img/icon/index_btn3.png" alt="">
                     <p>참여기업 수</p>
                 </button>
-                <button class="mainBtn1" @click="on_click3=!on_click3==true"
-                    v-if="on_click3==false">
+                <button class="mainBtn1" @click="offCompanyNumber()" v-if="companyButtonStatus==true">
                     <img src="~assets/img/icon/index_btn3w.png" alt="">
                     <p>참여기업 수</p>
                 </button>
@@ -57,20 +50,12 @@
                 </div>
             </div>
             
-            <div class="input" v-if="select_year">
-                <select name="" id="">
+            <div class="input" v-if="yearBarStatus">
+                <select name="" id="" v-model="year" @change="onChangeYear()"> 
                     <option value="">기준연도를 선택하세요.</option>
-                    <option value="">2022년</option>
-                    <option value="">2021년</option>
-                    <option value="">2020년</option>
-                    <option value="">2019년</option>
-                    <option value="">2018년</option>
-                    <option value="">2017년</option>
-                    <option value="">2016년</option>
-                    <option value="">2015년</option>
-                    <option value="">2014년</option>
-                    <option value="">2013년</option>
-                    <option value="">2012년</option>
+                    <option v-for="(item, index) in years" :key="index" :value="item">
+                        {{item}}년
+                    </option>
                 </select>
             </div>
 
@@ -94,52 +79,26 @@ export default {
             on_click3:true,
             on_click4:true,
 
+            // 버튼 상태
+            regionButtonStatus: false,
+            variationButtonStatus: false,
+            companyButtonStatus: false,
+            yearBarStatus: false,
+            
+
+            // 지역배출량, 증감량 데이터
+            years: [],
+            year: '',
+            regionEmissions: [],
+            variation: [],
+
+            // 지도 데이터
             map: null,
             polygons: [],
-            polygonStatus: 0, // 0: 빈화면, 1: 지역배출량, 2: 증감량
-            markers: [], // 마커 표현 데이터
+
+            markers: [], // 마커 데이터 집합
             markerStatus: 0, // 0: 빈화면, 1: 마커표시
-            infowindows: [],
-
-            region: [
-                { name: '서울특별시', value: 12324706 },
-                { name: '부산광역시', value: 6787007 },
-                { name: '대구광역시', value: 3697602 },
-                { name: '인천광역시', value: 45126832 },
-                { name: '광주광역시', value: 1443049 },
-                { name: '대전광역시', value: 3867799 },
-                { name: '울산광역시', value: 47203695 },
-                { name: '세종특별자치시', value: 2245895 },
-                { name: '경기도', value: 62896149 },
-                { name: '강원도', value: 44206196 },
-                { name: '충청북도', value: 21256076 },
-                { name: '충청남도', value: 141911607 },
-                { name: '전라북도', value: 13578538 },
-                { name: '전라남도', value: 93199097 },
-                { name: '경상북도', value: 50697916 },
-                { name: '경상남도', value: 35581389 },
-                { name: '제주특별자치도', value: 1584366 },
-            ],
-
-            variation: [
-                { name: '서울특별시', value: true },
-                { name: '부산광역시', value: false },
-                { name: '대구광역시', value: true },
-                { name: '인천광역시', value: false },
-                { name: '광주광역시', value: true },
-                { name: '대전광역시', value: false },
-                { name: '울산광역시', value: true },
-                { name: '세종특별자치시', value: false },
-                { name: '경기도', value: true },
-                { name: '강원도', value: false },
-                { name: '충청북도', value: true },
-                { name: '충청남도', value: false },
-                { name: '전라북도', value: true },
-                { name: '전라남도', value: false },
-                { name: '경상북도', value: true },
-                { name: '경상남도', value: false },
-                { name: '제주특별자치도', value: true },
-            ],
+            infowindows: [], // 인포윈도 데이터 집합
 
             company: [
                 { name: '(유)에스케이씨에보닉페록사이드코리아', address: '울산광역시 남구 상개로 99(상개동)', value: 57349, year: 2021, },
@@ -154,58 +113,60 @@ export default {
         kakao.maps.load(this.initMap())
     },
     methods: {
-
-        initMap() { // 맵 세팅
-            const container = document.getElementById("map") // DOM 레퍼런스
-            const options = {
-                center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
-                level: 12, // 확대, 축소
+        async onCompanyNumber() {
+            this.companyButtonStatus = true
+            try {
+                const res = await this.$axios.get('/allData/getEnterpriseEmission')
+                console.log(res.data.data)
+                this.company = res.data.data
+                this.drawMarker()
+            } catch (err) {
+                console.log(err)
             }
-            let map = new kakao.maps.Map(container, options) // 지도 생성
-            this.map = map
+        },
+
+        offCompanyNumber() {
+            this.companyButtonStatus = false
+            this.eraseMarker()
         },
 
         drawMarker() {
-            console.log('call on company')
-            let geocoder = new kakao.maps.services.Geocoder()
-            const _this = this
-
             this.company.map(company => {
-                geocoder.addressSearch(company.address, function(result, status) {
-                    if (status === kakao.maps.services.Status.OK) { // 정상적으로 검색이 완료됐으면 
 
+                let position = new kakao.maps.LatLng(company.lat, company.lng)
 
-                        let position = new kakao.maps.LatLng(result[0].y, result[0].x)
+                let markerImageSrc = "images/markerCo2.png"
+                let imageSize = new kakao.maps.Size(18, 24)
+                let imageOptions = {}
+                let markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOptions)
 
-                        let markerImageSrc = "images/markerCo2.png"
-                        let imageSize = new kakao.maps.Size(18, 24)
-                        let imageOptions = {}
-                        let markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOptions)
+                let marker = new kakao.maps.Marker({ // 마커 객체
+                    position: position,
+                    image: markerImage,
+                    clickable: true
+                })
+                this.markers.push(marker)
 
-                        let marker = new kakao.maps.Marker({
-                            position: position,
-                            image: markerImage
-                        })
+                let iwContent = `<div style="width: 200px; text-align:center; padding:6px; margin: 0 auto; font-size: 14px;">
+                                    <div>${company.companyName}</div>
+                                    <div>${company.value}tC / ${company.year.name}년</div>
+                                </div>`
+                // let iwRemoveable = true
 
-                        marker.setMap(_this.map)
+                let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우 객체
+                    content : iwContent,
+                    // removable : iwRemoveable
+                })
+                this.infowindows.push(infowindow)
 
-                        // let marker = new kakao.maps.Marker({ // 결과값으로 받은 위치를 마커로 표시합니다
-                        //     map: _this.map,
-                        //     position: coords
-                        // })
-                        let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우로 장소에 대한 설명을 표시합니다
-                            content: `
-                                <div style="width:150px;text-align:center;padding:6px 0;">
-                                    ${company.name}  / ${company.value} / ${company.year}
-                                </div>
-                            `
-                        })
-                        _this.infowindows.push(infowindow)
-                        infowindow.open(_this.map, marker)
-                        _this.markers.push(marker)
-                        _this.markerStatus = 1
-                    } 
-                })  
+                // 마커에 클릭이벤트를 등록합니다
+                const _this = this
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(_this.map, marker)
+                })
+
+                marker.setMap(this.map)
+
             })
             
         },
@@ -214,48 +175,104 @@ export default {
             this.markers.map(marker => { marker.setMap(null) })
             this.markerStatus = 0
             this.markers = []
-
             this.infowindows.map(infowindow => { infowindow.close() })
             this.infowindows = []
         },
 
-        onCompanyNumber() {
-            if(this.markerStatus === 0) {
-                this.drawMarker()
-            } else if(this.markerStatus === 1) {
-                this.eraseMarker()
+
+        // 지역배출량, 증감량 데이터 초기화
+        data_reset() {
+            this.erasePolygon()
+            this.regionEmissions = []
+            this.variation = []
+            this.years = []
+            this.year=''
+        },
+        // 증감량 on
+        async onRegionVariation() {
+            this.data_reset()
+            this.variationButtonStatus = true
+            this.yearBarStatus = true
+            if(this.regionButtonStatus) { this.regionButtonStatus = false }
+            try {
+                const res = await this.$axios.get('/allData/getRegionVariationYear')
+                console.log(res.data.data)
+                this.years = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        // 증감량 off
+        offRegionVariation() {
+            this.variationButtonStatus = false
+            this.yearBarStatus = false
+            this.data_reset()
+        },
+
+        // 증감량 데이터 조회
+        async getRegionVariation() {
+            try {
+                const res = await this.$axios.post('/allData/getRegionVariation', { year: this.year })
+                console.log(res.data.data)
+                this.variation = res.data.data
+            } catch (err) {
+                console.log(err)
             }
         },
 
-        onRegionEmission() {
-            if(this.polygonStatus === 0) {
-                this.drawPolygon(1)
-            } else if(this.polygonStatus === 1) {
-                this.erasePolygon()
-            } else if (this.polygonStatus === 2) {
-                this.erasePolygon()
-                this.drawPolygon(1)
+        // 지역배출량 on
+        async onRegionEmission() {
+            this.data_reset()
+            this.regionButtonStatus = true
+            this.yearBarStatus = true
+            if(this.variationButtonStatus) { this.variationButtonStatus = false }
+            try {
+                const res = await this.$axios.get('/allData/getRegionEmissionYear')
+                console.log(res.data.data)
+                this.years = res.data.data
+            } catch (err) {
+                console.log(err)
             }
         },
-        onRegionVariation() {
-            if(this.polygonStatus === 0) {
-                this.drawPolygon(2)
-            } else if(this.polygonStatus === 1) {
-                this.erasePolygon()
-                this.drawPolygon(2)
-            } else if (this.polygonStatus === 2) {
-                this.erasePolygon()
+        // 지역배출량 연도 선택시 폴리곤 draw
+        async onChangeYear() {
+            this.erasePolygon()
+            try {
+                if(this.regionButtonStatus) {
+                    await this.getRegionEmission()
+                    this.drawPolygon(1)
+                } else if(this.variationButtonStatus) {
+                    await this.getRegionVariation()
+                    this.drawPolygon(2)
+                }
+            } catch (err) {
+                console.log(err)
             }
         },
+        // 지역배출량 데이터 조회
+        async getRegionEmission() {
+            try {
+                const res = await this.$axios.post('/allData/getRegionEmission', { year: this.year })
+                console.log(res.data.data)
+                this.regionEmissions = res.data.data
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        // 지역배출량 off
+        offRegionEmission() {
+            this.regionButtonStatus = false
+            this.yearBarStatus = false
+            this.data_reset()
+        },
 
-        drawPolygon(type) { // type = 1 : 지역배출량, 2: 증감량
-
+        drawPolygon(type) { // type = 1 : 지역배출량 그리기, 2: 증감량 그리기
             const sido_array = sido.features // 시도 데이터 배열 생성
             let regionPolygonData = []
             sido_array.map(item => {
                 let value 
                 if(type === 1) {
-                    value = this.region.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
+                    value = this.regionEmissions.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
                 } else if (type === 2) {
                     value = this.variation.filter(region => region.name === item.properties.CTP_KOR_NM)[0].value
                 }
@@ -265,7 +282,6 @@ export default {
                     value,
                 })
             })
-
             regionPolygonData.map((region) => { // 폴리곤 생성 및 배열에 담기
                 region.coordinates.map((polygonCoordinates) => {
                     let polygonPath = []
@@ -285,15 +301,31 @@ export default {
                     this.polygons.push(polygon)
                 })
             })
-
             // 지도에 표시
             this.polygons.map(polygon => { polygon.setMap(this.map) })
-            this.polygonStatus = type
+        },
+
+        
+
+        erasePolygon() {
+            this.polygons.map(polygon => { polygon.setMap(null) })
+            this.polygons = []
+        },
+
+
+        initMap() { // 맵 세팅
+            const container = document.getElementById("map") // DOM 레퍼런스
+            const options = {
+                center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
+                level: 12, // 확대, 축소
+            }
+            let map = new kakao.maps.Map(container, options) // 지도 생성
+            this.map = map
         },
 
         getColorFromEmission(value) { // 색깔 생성기
             let emissions = []
-            this.region.map(region => { emissions.push(region.value) })
+            this.regionEmissions.map(region => { emissions.push(region.value) })
             const maxValue = Math.max.apply(null, emissions)
             const unit = Math.ceil(maxValue / 4) 
 
@@ -322,13 +354,6 @@ export default {
             }
         },
 
-        erasePolygon() {
-            this.polygons.map(polygon => { polygon.setMap(null) })
-            this.polygonStatus = 0
-            this.polygons = []
-        },
-
-        
     }
 }
 </script>

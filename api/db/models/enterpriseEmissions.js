@@ -26,6 +26,16 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING,
           allowNull: true,
           comment: '소재지'
+        },
+        lat: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          comment: '위도'
+        },
+        lng: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          comment: '경도'
         }
     }, {
         tableName: 'enterpriseEmissions',
