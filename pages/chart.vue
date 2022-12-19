@@ -42,28 +42,16 @@ export default{
     }
   },
   // 연도 순서대로 정렬
-  // 연도 클릭시 변하도록
   mounted(){
     this.getDatas(0);
   },
   watch:{
     "selected_year_id"(){
       // 부문별 탄소 배출량
-      if(this.selected_year_id !== this.year_select[0].id){
-
-        let changed_data = this.industry_info.filter(item=>{
-          return this.selected_year_id === item.year_id;
-        });
-        this.show_table('pieChartData', 0, changed_data);
-      }
-
-      // if(this.year_select[0].id === this.year_select[0].id){
-      //   let changed_data = this.industry_info.filter(item=>{
-      //     return this.year_select[0].id === item.year_id;
-      //   });
-      //   this.show_table('pieChartData', 0, changed_data);
-      // }
-
+      let changed_data = this.industry_info.filter(item=>{
+        return this.selected_year_id === item.year_id;
+      });
+      this.show_table('pieChartData', 0, changed_data);
     },
     "on_tab"(){
       // 연도별 탄소 배출량
