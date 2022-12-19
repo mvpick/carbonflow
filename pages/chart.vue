@@ -39,7 +39,6 @@ export default{
       barChartData : null,
       barChartOptions : null,
       ticks_max : null,
-      changed : false,
     }
   },
   // 연도 순서대로 정렬
@@ -51,12 +50,12 @@ export default{
     "selected_year_id"(){
       // 부문별 탄소 배출량
       if(this.selected_year_id !== this.year_select[0].id){
-        this.industry_info = this.industry_info.filter(item=>{
-          return this.selected_year_id === item.id;
+
+        let changed_data = this.industry_info.filter(item=>{
+          return this.selected_year_id === item.year_id;
         });
-        console.log(this.industry_info,'this.industry_info <<< 2')
-        
-        this.show_table('pieChartData', 0, this.industry_info);
+        console.log(changed_data,'필터링된 연도')
+        this.show_table('pieChartData', 0, changed_data);
       }
      
     },
@@ -96,34 +95,31 @@ export default{
           
         }
 
-        if(!this.changed){
-          // 초기 연도 디폴트 setting..
-          this.selected_year_id = this.year_select[0].id;
-          this.industry_info = this.industry_info.filter(item=>{
-            return this.selected_year_id === item.year_id;
-          });
-          // console.log(this.industry_info,'this.industry_info 필터완 -> 디폴트')
+        // 초기 연도 디폴트 setting..
+        this.selected_year_id = this.year_select[0].id;
 
-          this.on_tab = index;
+        let default_data = this.industry_info.filter(item=>{
+          return this.selected_year_id === item.year_id;
+        });
+        this.on_tab = index;
 
-          this.pieChartData = {
-              labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
-              datasets: [
-                {
-                  data: [this.industry_info[0].energy ,this.industry_info[0].process , this.industry_info[0].agriculture , this.industry_info[0].lulucf, this.industry_info[0].waste],
-                  backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
-                }
-              ]
-          };
-          this.pieChartOptions = {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              },
-              title: {
-                display: false
+        this.pieChartData = {
+            labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
+            datasets: [
+              {
+                data: [default_data[0].energy, default_data[0].process, default_data[0].agriculture , default_data[0].lulucf, default_data[0].waste],
+                backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
               }
+            ]
+        };
+        this.pieChartOptions = {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: false
             }
           }
         }
@@ -136,10 +132,12 @@ export default{
     },
 
     show_table(type, index, data){
-      console.log('show_table <<')
       this.on_tab = index;
       if(type==='pieChartData' && index === 0){
         if(!!data){
+          // console.log(data,'<< data 필터링 되어서 들어온 데이터')
+          this.pieChartData.datasets[0].data = []; //  초기화
+
           this.pieChartData = {
             labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
             datasets: [
@@ -160,6 +158,8 @@ export default{
               }
             }
           }
+
+          console.log(this.pieChartData,'this.pieChartData???')
 
         }
       }
