@@ -31,33 +31,46 @@ export default{
   return{
       selected_year_id : null,
       on_tab: -1,
-      pieChartData : null,
-      pieChartOptions : null,
+      pieChartData : {
+          labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
+          datasets: [
+            {
+              data: [100,200,-300,400,500],
+              backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
+            }
+          ]
+      },
+      pieChartOptions : {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: false
+          }
+        }
+      },
       year_info : [],
       industry_info : [],
       year_select : [],
       barChartData : null,
       barChartOptions : null,
       ticks_max : null,
+      
     }
   },
   // 연도 순서대로 정렬
-  // 연도 클릭시 변하도록
   mounted(){
     this.getDatas(0);
   },
   watch:{
     "selected_year_id"(){
       // 부문별 탄소 배출량
-      if(this.selected_year_id !== this.year_select[0].id){
-
-        let changed_data = this.industry_info.filter(item=>{
-          return this.selected_year_id === item.year_id;
-        });
-        console.log(changed_data,'필터링된 연도')
-        this.show_table('pieChartData', 0, changed_data);
-      }
-     
+      let changed_data = this.industry_info.filter(item=>{
+        return this.selected_year_id === item.year_id;
+      });
+      this.show_table('pieChartData', 0, changed_data);
     },
     "on_tab"(){
       // 연도별 탄소 배출량
@@ -73,13 +86,15 @@ export default{
         this.ticks_max = Math.round(res.data.data.year_info[0].value) ;
 
         // 부문별 탄소 배출량
-        for(let one of res.data.data.industry_info){
-          let [__] = res.data.data.year.filter(item=>{
-            return one.year_id === item.id;
+        for(let one of res.data.data.year){
+          let [__] = res.data.data.industry_info.filter(item=>{
+            return one.id === item.year_id;
           })
-          one.year = __;
-          this.year_select.push(__);
-          this.industry_info.push(one)
+          if(!!__){
+            __.year = one;
+            this.year_select.push(one);
+            this.industry_info.push(__)
+          }
         }
 
         // 연도별 탄소 배출량
@@ -102,42 +117,17 @@ export default{
           return this.selected_year_id === item.year_id;
         });
         this.on_tab = index;
-
-        this.pieChartData = {
-            labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
-            datasets: [
-              {
-                data: [default_data[0].energy, default_data[0].process, default_data[0].agriculture , default_data[0].lulucf, default_data[0].waste],
-                backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
-              }
-            ]
-        };
-        this.pieChartOptions = {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: false
-            }
-          }
-        }
+        this.pieChartData.datasets[0].data = [default_data[0].energy, default_data[0].process, default_data[0].agriculture , default_data[0].lulucf, default_data[0].waste];
         
-        
-
       }).catch(err => {
         console.log(err);
       })
     },
 
     show_table(type, index, data){
-      this.on_tab = index;
       if(type==='pieChartData' && index === 0){
+        this.on_tab = -1;
         if(!!data){
-          // console.log(data,'<< data 필터링 되어서 들어온 데이터')
-          this.pieChartData.datasets[0].data = []; //  초기화
-
           this.pieChartData = {
             labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
             datasets: [
@@ -146,21 +136,7 @@ export default{
                 backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
               }
             ]
-          };
-          this.pieChartOptions = {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              },
-              title: {
-                display: false
-              }
-            }
-          }
-
-          console.log(this.pieChartData,'this.pieChartData???')
-
+          };          
         }
       }
       
@@ -222,6 +198,10 @@ export default{
           
         }
       }
+
+      setTimeout(() => {
+        this.on_tab = index;
+      }, 100);
     }
   }
 }
