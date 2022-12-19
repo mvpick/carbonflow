@@ -42,19 +42,18 @@ export default{
     }
   },
   mounted(){
-    this.getDatas();
-    this.show_table('pieChartData', 0);
+    // this.on_tab = 0;
+    this.getDatas(0);
+    // this.show_table('pieChartData', 0);
   },
   watch:{
     "selected_year_id"(){
       // 부문별 탄소 배출량
-      if(this.on_tab === 0 && this.selected_year_id !== null){
-        console.log('부문별 탄소 배출량 탭')
+      if(this.selected_year_id !== null){
         this.industry_info = this.industry_info.filter(item=>{
           return this.selected_year_id === item.id;
         });
-        console.log(this.industry_info,'this.industry_info 전체전체')
-        this.show_table('pieChartData', 0, this.industry_info);
+        // this.show_table('pieChartData', 0, this.industry_info);
       }
      
     },
@@ -66,7 +65,7 @@ export default{
     }
   },
   methods:{
-    getDatas(){
+    getDatas(index){
       this.$axios.get('/allData/getAllData')
       .then(res => {
         this.ticks_max = Math.round(res.data.data.year_info[0].value) ;
@@ -95,7 +94,35 @@ export default{
         }
 
         // 초기 연도 디폴트 setting..
-        // this.selected_year_id = this.year_select[0].id;
+        this.selected_year_id = this.year_select[0].id;
+        this.industry_info = this.industry_info.filter(item=>{
+          return this.selected_year_id === item.year_id;
+        });
+        // console.log(this.industry_info,'this.industry_info 필터완 -> 디폴트')
+
+        this.on_tab = index;
+
+        this.pieChartData = {
+            labels: ['에너지', '산업공정', '농업', 'LULUCF', '폐기물'],
+            datasets: [
+              {
+                data: [this.industry_info[0].energy ,this.industry_info[0].process , this.industry_info[0].agriculture , this.industry_info[0].lulucf, this.industry_info[0].waste],
+                backgroundColor: ['red', 'blue', 'green', 'black', 'yellow'],
+              }
+            ]
+          };
+          this.pieChartOptions = {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              title: {
+                display: false
+              }
+            }
+          }
+        
 
       }).catch(err => {
         console.log(err);
