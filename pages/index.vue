@@ -36,18 +36,14 @@
                     <p>참여기업 수</p>
                 </button>
 
-                <div class="button" @click="rank_chart=!rank_chart==true">
-                    <button class="mainBtn2" @click="on_click4=!on_click4==true"
-                    v-if="on_click4==true">
-                        <img src="~assets/img/icon/index_btn4.png" alt="">
-                        <p>국제 배출량 순위</p>
-                    </button>
-                    <button class="mainBtn1" @click="on_click4=!on_click4==true"
-                    v-if="on_click4==false">
-                        <img src="~assets/img/icon/index_btn4w.png" alt="">
-                        <p>국제 배출량 순위</p>
-                    </button>
-                </div>
+                <button class="mainBtn2" @click="onNationalEmission()" v-if="nationalButtonStatus==false">
+                    <img src="~assets/img/icon/index_btn4.png" alt="">
+                    <p>국제 배출량 순위</p>
+                </button>
+                <button class="mainBtn1" @click="offNationalEmission()" v-if="nationalButtonStatus==true">
+                    <img src="~assets/img/icon/index_btn4w.png" alt="">
+                    <p>국제 배출량 순위</p>
+                </button>
             </div>
             
             <div class="input" v-if="yearBarStatus">
@@ -59,7 +55,9 @@
                 </select>
             </div>
 
-            <div class="rank_chart" v-if="rank_chart"></div>
+            <div class="rank_chart" v-show="rankBarStatus">
+                <canvas id="myChart"></canvas>
+            </div>
         </div>
 
     </div>
@@ -72,47 +70,114 @@ import sido from '~/json/sido.json' // 지역 위경도
 export default {
     data() {
         return {
-            select_year: false,
-            rank_chart: false,
-            on_click1:true,
-            on_click2:true,
-            on_click3:true,
-            on_click4:true,
 
             // 버튼 상태
             regionButtonStatus: false,
             variationButtonStatus: false,
             companyButtonStatus: false,
             yearBarStatus: false,
-            
+            nationalButtonStatus: false,
+            rankBarStatus: false,
 
-            // 지역배출량, 증감량 데이터
+            // 데이터
             years: [],
             year: '',
             regionEmissions: [],
             variation: [],
+            company: [],
 
             // 지도 데이터
             map: null,
             polygons: [],
-
             markers: [], // 마커 데이터 집합
             markerStatus: 0, // 0: 빈화면, 1: 마커표시
             infowindows: [], // 인포윈도 데이터 집합
 
-            company: [
-                { name: '(유)에스케이씨에보닉페록사이드코리아', address: '울산광역시 남구 상개로 99(상개동)', value: 57349, year: 2021, },
-                { name: '(주)HJ매그놀리아용평호텔앤리조트', address: '강원도 평창군 대관령면 올림픽로 715', value: 33424, year: 2021, },
-                { name: '(주)MSC', address: '경상남도 양산시 소주회야로 45-73', value: 29558, year: 2021, },
-            ],
+            // 바 차트
+            labels: [],
+            barChartData : null,
+            barChartOptions : null,
 
-            
         }
     },
     mounted() {
         kakao.maps.load(this.initMap())
     },
     methods: {
+        onNationalEmission() {
+            this.nationalButtonStatus = true
+            this.rankBarStatus = true
+
+            var ctx = document.getElementById('myChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'horizontalBar', // 만들기 원하는 차트의 유형
+                data: { // 데이터 집합을 위한 데이터
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: '국제배출량 순위',
+                        backgroundColor: '#A9D8B1',
+                        borderColor: '#A9D8B1',
+                        data: [0, 10, 5, 2, 20, 30, 45]
+                    }]
+                },
+                options: { // 설정
+                    legend: { // 타이틀
+                        labels: {
+                            fontColor: "white",
+                            fontSize: 14
+                        }
+                    },
+                    scales: {
+                        yAxes: [{ // y축 스타일
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize : 2,
+                                fontColor : "white",
+                                fontSize : 14,
+                            },
+                            gridLines:{
+                                lineWidth: 0
+                            }
+                        }],
+                        xAxes: [{ // x축 스타일
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize : 2,
+                                fontColor : "white",
+                                fontSize : 14,
+                            },
+                            gridLines:{
+                                lineWidth: 0
+                            }
+                        }],
+                    }
+                }
+            })
+
+            // this.barChartOptions = {
+            //     indexAxis: 'y'
+            // }
+
+            // this.barChartData = {
+            //     labels: ['중국', '미국', '인도', '러시아', '일본', '이란', '독일', '대한민국', '인도네시아', '사우디아라비아'],
+            //     datasets: [{
+            //         // axis: 'y',
+            //         label: '국제 배출량 순위',
+            //         data: [65, 59, 80, 81, 50, 55, 29, 29, 34, 34],
+            //         fill: true,
+            //         backgroundColor: '#A9D8B1',
+            //         borderColor: '#A9D8B1',
+            //         borderWidth: 1
+            //     }]
+            // }
+            
+        },
+
+        offNationalEmission() {
+            this.nationalButtonStatus = false
+            this.rankBarStatus = false
+        },
+
         async onCompanyNumber() {
             this.companyButtonStatus = true
             try {

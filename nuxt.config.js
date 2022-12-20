@@ -24,6 +24,9 @@ export default {
       {
         src: `//dapi.kakao.com/v2/maps/sdk.js?appkey=${ process.env.KAKAO_KEY }&libraries=services`
       },
+      {
+        src: "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
+      }
     ],
   },
 
