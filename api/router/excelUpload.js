@@ -36,5 +36,8 @@ router.post('/uploadYearIndustryEmissions', file_upload.single('file'), excelUpl
 router.post('/uploadRegionEmissions', file_upload.single('file'), excelUpload.uploadRegionEmissions);
 router.post('/uploadEnterpriseEmissions', file_upload.single('file'), excelUpload.uploadEnterpriseEmissions);
 router.post('/uploadTargetTradeEmissions', file_upload.single('file'), excelUpload.uploadTargetTradeEmissions);
+router.post('/uploadTnternationalEmissions', file_upload.single('file'), excelUpload.uploadTnternationalEmissions);
+
+
 
 module.exports = router

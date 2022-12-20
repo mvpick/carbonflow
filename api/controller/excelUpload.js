@@ -9,6 +9,7 @@ const RegionEmissions = require('../db/models').regionEmissions;
 const EnterpriseEmissions = require('../db/models').enterpriseEmissions;
 const TargetEmissions = require('../db/models').targetEmissions;
 const TradeEmissions = require('../db/models').tradeEmissions;
+const InternationalEmissions = require('../db/models').internationalEmissions;
 
 const sequelize = require("../db/models").sequelize
 
@@ -352,6 +353,51 @@ export const uploadTargetTradeEmissions = async (req, res) => {
     console.error(err);
     return res.status(400).send({
       message: err.massage === 'undefined data' ? '참여기업 데이터가 없습니다.' : 'fail'
+    })
+  }
+}
+
+// 국제 배출량
+export const uploadTnternationalEmissions = async(req, res) => {
+  try {
+    const file = req.file;
+
+    fs.readdir( "static/files", function( error, filelist ) {
+      for(let i = 0; i < filelist.length - 1; i++) {
+        fs.unlinkSync(`static/files/${ filelist[i] }`);
+      }
+    });
+
+    const excelFile = xlsx.readFile(file.path);
+    const sheetNames = excelFile.SheetNames;
+    const sheets = sheetNames.map(item => excelFile.Sheets[item]);
+    const result = sheets.map(item => excelFilter(item));
+
+    console.log(result)
+
+    await TradeEmissions.destroy({
+      truncate: true
+    })
+
+    await Promise.all(
+      result[0].map(async item => {
+
+        await InternationalEmissions.create({
+          rank: item['순위'],
+          country: item['상위10개국'],
+          value: item['2020년 배출량(MtCO2)'],
+        })
+      })
+    );
+
+
+    return res.status(200).send({
+      message: 'success'
+    })
+  } catch(err) {
+    console.error(err);
+    return res.status(400).send({
+      message: 'fail'
     })
   }
 }
