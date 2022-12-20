@@ -412,9 +412,10 @@ export default {
 
         initMap() { // 맵 세팅
             const container = document.getElementById("map") // DOM 레퍼런스
+            console.log(window.innerWidth)
             const options = {
                 center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
-                level: 13, // 확대, 축소
+                level: window.innerWidth < 600 ? 13 : 12, // 확대, 축소
             }
             let map = new kakao.maps.Map(container, options) // 지도 생성
             this.map = map
