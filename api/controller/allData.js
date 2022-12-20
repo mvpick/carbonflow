@@ -69,7 +69,7 @@ export const getRegionEmissionYear = async(req, res) => {
             include: {
                 model: RegionEmissions
             },
-            order: [['createdAt', 'DESC']],
+            order: [['name', 'DESC']],
         })
         console.log(find_year)
         let years = []
@@ -130,7 +130,7 @@ export const getRegionVariationYear = async(req, res) => {
             include: {
                 model: RegionEmissions
             },
-            order: [['createdAt', 'DESC']],
+            order: [['name', 'DESC']],
         })
         console.log(find_year)
         let years = []
@@ -234,7 +234,7 @@ export const postLatLng = async(req, res) => {
             lat,
             lng
         }, {
-            where: { id, }
+            where: { id }
         })
 
         console.log(findEnterpriseEmission)

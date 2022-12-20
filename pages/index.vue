@@ -195,6 +195,25 @@ export default {
             this.eraseMarker()
         },
 
+        postLatLang() { // 주소 검색 후 위경도 주입 
+            let geocoder = new kakao.maps.services.Geocoder()
+            const _this = this
+            this.company.map(company => {
+                geocoder.addressSearch(company.address, async function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const lat = result[0].y
+                        const lng = result[0].x
+                        const res = await _this.$axios.post('/allData/postLatLng', {
+                            id: company.id,
+                            lat,
+                            lng
+                        })
+                        console.log(res)
+                    } 
+                })
+            })
+        },
+
         drawMarker() {
             this.company.map(company => {
 
@@ -517,7 +536,7 @@ export default {
                 
             }
             .rank_chart{
-                background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.4);
                 padding: 8px;
                 margin: 16px;
                 border-radius: 12px;
