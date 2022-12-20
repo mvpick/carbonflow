@@ -72,10 +72,10 @@ export default {
         return {
 
             // 버튼 상태
-            regionButtonStatus: false,
+            regionButtonStatus: true,
             variationButtonStatus: false,
             companyButtonStatus: false,
-            yearBarStatus: false,
+            yearBarStatus: true,
             nationalButtonStatus: false,
             rankBarStatus: false,
 
@@ -100,8 +100,13 @@ export default {
 
         }
     },
-    mounted() {
+    async mounted() {
         kakao.maps.load(this.initMap())
+        await this.onRegionEmission()
+        this.year = 2020
+        await this.getRegionEmission()
+        this.drawPolygon(1)
+
     },
     methods: {
         async onNationalEmission() {
@@ -231,15 +236,22 @@ export default {
                 })
                 this.markers.push(marker)
 
-                let iwContent = `<div style="width: 200px; text-align:center; padding:6px; margin: 0 auto; font-size: 14px;">
+                let iwContent = `<div 
+                                    style="
+                                        width: 200px; 
+                                        text-align:center; 
+                                        padding:6px; 
+                                        margin: 0 auto; 
+                                        font-size: 14px;
+                                    ">
                                     <div>${company.companyName}</div>
                                     <div>${company.value}tC / ${company.year.name}년</div>
                                 </div>`
-                // let iwRemoveable = true
+                let iwRemoveable = true
 
                 let infowindow = new kakao.maps.InfoWindow({ // 인포윈도우 객체
                     content : iwContent,
-                    // removable : iwRemoveable
+                    removable : iwRemoveable
                 })
                 this.infowindows.push(infowindow)
 
@@ -318,6 +330,7 @@ export default {
                 console.log(err)
             }
         },
+
         // 지역배출량 연도 선택시 폴리곤 draw
         async onChangeYear() {
             this.erasePolygon()
@@ -401,7 +414,7 @@ export default {
             const container = document.getElementById("map") // DOM 레퍼런스
             const options = {
                 center: new kakao.maps.LatLng(36.4895, 127.7295), // 중심좌표
-                level: 12, // 확대, 축소
+                level: 13, // 확대, 축소
             }
             let map = new kakao.maps.Map(container, options) // 지도 생성
             this.map = map
@@ -444,6 +457,8 @@ export default {
 
 <style lang="scss" scoped>
 #index{
+
+   
     .map-wrapper {
         height: calc(100vh - 64px);
         width: 100vw;
