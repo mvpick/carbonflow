@@ -104,73 +104,73 @@ export default {
         kakao.maps.load(this.initMap())
     },
     methods: {
-        onNationalEmission() {
+        async onNationalEmission() {
             this.nationalButtonStatus = true
             this.rankBarStatus = true
 
-            var ctx = document.getElementById('myChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'horizontalBar', // 만들기 원하는 차트의 유형
-                data: { // 데이터 집합을 위한 데이터
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: '국제배출량 순위',
-                        backgroundColor: '#A9D8B1',
-                        borderColor: '#A9D8B1',
-                        data: [0, 10, 5, 2, 20, 30, 45]
-                    }]
-                },
-                options: { // 설정
-                    legend: { // 타이틀
-                        labels: {
-                            fontColor: "white",
-                            fontSize: 14
-                        }
+            try {
+                const res = await this.$axios.get('/allData/getInternationalEmission')
+                const nationalData = res.data.data
+                let labels = []
+                let data = []
+
+                nationalData.map(item => {
+                    labels.push(item.country)
+                    data.push(item.value)
+                })
+
+                var ctx = document.getElementById('myChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'horizontalBar', // 만들기 원하는 차트의 유형
+                    data: { // 데이터 집합을 위한 데이터
+                        labels, 
+                        datasets: [{
+                            label: '국제배출량 순위',
+                            backgroundColor: '#A9D8B1',
+                            borderColor: '#A9D8B1',
+                            data,
+                        }]
                     },
-                    scales: {
-                        yAxes: [{ // y축 스타일
-                            ticks: {
-                                beginAtZero: true,
-                                stepSize : 2,
-                                fontColor : "white",
-                                fontSize : 14,
-                            },
-                            gridLines:{
-                                lineWidth: 0
+                    options: { // 설정
+                        legend: { // 타이틀
+                            labels: {
+                                fontColor: "white",
+                                fontSize: 14
                             }
-                        }],
-                        xAxes: [{ // x축 스타일
-                            ticks: {
-                                beginAtZero: true,
-                                stepSize : 2,
-                                fontColor : "white",
-                                fontSize : 14,
-                            },
-                            gridLines:{
-                                lineWidth: 0
-                            }
-                        }],
+                        },
+                        scales: {
+                            yAxes: [{ // y축 스타일
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize : 2,
+                                    fontColor : "white",
+                                    fontSize : 10,
+                                },
+                                gridLines:{
+                                    lineWidth: 0
+                                }
+                            }],
+                            xAxes: [{ // x축 스타일
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize : 2,
+                                    fontColor : "white",
+                                    fontSize : 10,
+                                },
+                                gridLines:{
+                                    lineWidth: 0
+                                },
+                                ticks: {
+                                    stepSize: 2000,
+                                    fontColor : "white",
+                                },
+                            }],
+                        }
                     }
-                }
-            })
-
-            // this.barChartOptions = {
-            //     indexAxis: 'y'
-            // }
-
-            // this.barChartData = {
-            //     labels: ['중국', '미국', '인도', '러시아', '일본', '이란', '독일', '대한민국', '인도네시아', '사우디아라비아'],
-            //     datasets: [{
-            //         // axis: 'y',
-            //         label: '국제 배출량 순위',
-            //         data: [65, 59, 80, 81, 50, 55, 29, 29, 34, 34],
-            //         fill: true,
-            //         backgroundColor: '#A9D8B1',
-            //         borderColor: '#A9D8B1',
-            //         borderWidth: 1
-            //     }]
-            // }
-            
+                })
+            } catch (err) {
+                console.log(err)
+            }
         },
 
         offNationalEmission() {
@@ -518,7 +518,7 @@ export default {
             }
             .rank_chart{
                 background-color: rgba(0, 0, 0, 0.3);
-                padding: 12px;
+                padding: 8px;
                 margin: 16px;
                 border-radius: 12px;
                 color: #fff;

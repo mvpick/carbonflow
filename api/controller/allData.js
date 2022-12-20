@@ -6,6 +6,7 @@ const Year = require('../db/models').year;
 const RegionEmissions = require('../db/models').regionEmissions;
 const Region = require('../db/models').region;
 const EnterpriseEmissions = require('../db/models').enterpriseEmissions;
+const InternationalEmissions = require('../db/models').internationalEmissions;
 const sequelize = require("../db/models").sequelize;
 
 export const getAllData = async(req, res) => {
@@ -242,5 +243,24 @@ export const postLatLng = async(req, res) => {
     } catch (error) {
         console.log(error,'error')
         return res.status(500).send({ code : 500, message: '위, 경도 주입 실패' })
+    }
+}
+
+
+// 국제 배출량
+export const getInternationalEmission = async(req, res) => {
+    try {
+        const findInternationalEmissions = await InternationalEmissions.findAll({
+            order: [
+                ['value', 'DESC'],
+            ],
+        })
+
+        console.log(findInternationalEmissions)
+
+        return res.status(200).send({ code: 200, message: '국제 배출량 조회 성공', data: findInternationalEmissions })
+    } catch (error) {
+        console.log(error,'error')
+        return res.status(500).send({ code : 500, message: '국제 배출량 조회 실패' })
     }
 }
