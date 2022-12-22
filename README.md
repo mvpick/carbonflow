@@ -5,20 +5,18 @@
 
 ```bash
 # APP
-APP_ENVIRONMENT=dev
-APP_PORT=3008
-APP_HOST=localhost
-
 APP_ENVIRONMENT=development
+APP_PORT=3000
+APP_HOST=localhost
 
 # KAKAO
 KAKAO_KEY=40b8fc94c32c1ff8fa408440485e6caa
 
 # DATABASE
 DB_USERNAME=admin
-DB_PASSWORD=eventcon!A
+DB_PASSWORD=Nwokorea!!91
 DB_DATABASE=carbonflow
-DB_HOST=eventdb.cazhs06fbmc0.ap-northeast-2.rds.amazonaws.com
+DB_HOST=ec2-3-39-144-172.ap-northeast-2.compute.amazonaws.com
 
 
 ```
