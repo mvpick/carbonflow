@@ -12,11 +12,6 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: true,
           comment: '업체명'
         },
-        year_id : {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-          comment: '연도'
-        },
         value: {
           type: DataTypes.STRING,
           allowNull: true,

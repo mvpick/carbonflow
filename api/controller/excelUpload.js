@@ -249,6 +249,7 @@ export const uploadEnterpriseEmissions = async(req, res) => {
   }
 }
 
+// 목표관리제 / 배출권거래제
 export const uploadTargetTradeEmissions = async (req, res) => {
   try {
     const file = req.file;

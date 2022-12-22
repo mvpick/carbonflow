@@ -7,11 +7,6 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             allowNull: false
         },
-        year_id : {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            comment: '연도'
-        },
         energy : {
             type: DataTypes.INTEGER,
             allowNull: true,
