@@ -10,18 +10,30 @@ const InternationalEmissions = require('../db/models').internationalEmissions;
 const sequelize = require("../db/models").sequelize;
 
 export const getAllData = async(req, res) => {
+    console.log('call get all data')
     try {
         const industry_info = await IndustryEmissions.findAll({ order: [['created_at', 'DESC']] }); // 부문별
-        const year_info = await YearEmissions.findAll({
-            group: ['value'],
-            order: [[sequelize.fn('max', sequelize.col('value')), 'DESC']],
-            raw: true
-        }); // 연도별
+
+
+        // 임시 수정 쿼리 
+        const find_year = await Year.findAll({
+            include: { model: YearEmissions }
+        })
+        const year_info2 = find_year.filter(item => item.yearEmissions.length > 0)
+
+
+        // 이 쿼리문에서 에러나서 우선 주석처리하였습니다..
+        // const year_info = await YearEmissions.findAll({
+        //     group: ['value'],
+        //     order: [[sequelize.fn('max', sequelize.col('value')), 'DESC']],
+        //     raw: true
+        // }); // 연도별
+        const year_info = null
+
         const year = await Year.findAll({ attributes: ['id', 'name'], order: [['name', 'DESC']] }); // 조회 연도
-        // console.log(year,'year 체크')
+        console.log(year,'year 체크')
 
-
-        return res.status(200).send({ code: 200, message: '모든 차트 데이터 조회 성공', data : {industry_info, year_info, year} })
+        return res.status(200).send({ code: 200, message: '모든 차트 데이터 조회 성공', data : { industry_info, year_info, year, year_info2 } })
 
     } catch (error) {
         console.log(error,'error')

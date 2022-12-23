@@ -83,7 +83,7 @@ export default{
     getDatas(index){
       this.$axios.get('/allData/getAllData')
       .then(res => {
-        this.ticks_max = Math.round(res.data.data.year_info[0].value) ;
+        // this.ticks_max = Math.round(res.data.data.year_info[0].value) ;
 
         // 부문별 탄소 배출량
         for(let one of res.data.data.year){
@@ -98,17 +98,18 @@ export default{
         }
 
         // 연도별 탄소 배출량
-        for(let one of res.data.data.year){
-          let [__] = res.data.data.year_info.filter(item=>{
-            return one.id === item.year_id;
-          })
+        // for(let one of res.data.data.year){
+        //   let [__] = res.data.data.year_info.filter(item=>{
+        //     return one.id === item.year_id;
+        //   })
 
-          if(!!__) { 
-            one.year = __;
-            this.year_info.push(one);
-          };
+        //   if(!!__) { 
+        //     one.year = __;
+        //     this.year_info.push(one);
+        //   };
           
-        }
+        // }
+        this.year_info = res.data.data.year_info2
 
         // 초기 연도 디폴트 setting..
         this.selected_year_id = this.year_select[0].id;
@@ -142,19 +143,21 @@ export default{
       }
       
       if(type==='barChartOptions' && index === 1){
+
         if(!!data){
           let x_year = [];
           let y_data = [];
           for(let one of data){
             x_year.push(one.name);
-            y_data.push(one.year.value);
+            // y_data.push(one.year.value);
+            y_data.push(one.yearEmissions[0].value);
           };
 
           this.barChartData = {
             labels: x_year, // x 축
             datasets: [
               {
-                label: "Visualizaciones",
+                label: "탄소배출량",
                 data: y_data, // y축
                 backgroundColor: "rgba(20, 255, 0, 0.3)",
                 borderColor: "rgba(100, 255, 0, 1)",
@@ -185,9 +188,10 @@ export default{
                 {
                   ticks: {
                     beginAtZero: true,
-                    max: this.ticks_max,
+                    // max: this.ticks_max,
+                    max: 1000000,
                     min: 0,
-                    stepSize: 10000,
+                    stepSize: 100000,
                   },
                   gridLines: {
                     display: true,
