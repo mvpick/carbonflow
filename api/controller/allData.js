@@ -22,7 +22,7 @@ export const getAllData = async(req, res) => {
         const year_info2 = find_year.filter(item => item.yearEmissions.length > 0)
 
 
-        // 이 쿼리문에서 에러나서 우선 주석처리하였습니다..
+        // 이 쿼리문에서 에러나서 우선 주석처리
         // const year_info = await YearEmissions.findAll({
         //     group: ['value'],
         //     order: [[sequelize.fn('max', sequelize.col('value')), 'DESC']],

@@ -215,20 +215,23 @@ export default{
 <style lang="scss" scoped>
 #chart{
   .select_year{
+    // IOS 에서 깨져서 수정
     border: 2px solid black;
-    text-align: center;
+    // text-align: center;
+    padding: 16px 20px;
     border-radius: 10px;
-    height: 50px;
-    width: 80px;
+    // height: 50px;
+    // width: 80px;
     margin-bottom: 10px;
   }
  	padding-bottom: 100px;
-    .tab_section{
-        margin-bottom: 40px;
-    }
-    .industry,
-    .year{
-        padding: 16px;
-    }
+  .tab_section{
+      margin-bottom: 40px;
+  }
+  .industry,
+  .year{
+      padding: 16px;
+  }
+
 }
 </style>
